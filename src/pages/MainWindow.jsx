@@ -3,13 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
   Repeat, 
-  PlusCircle, 
+  Plus, 
   Search, 
   ArrowRight, 
-  Sparkles, 
-  ShieldCheck, 
-  Clock, 
-  ChevronRight,
   BookOpen,
   Laptop,
   Shirt,
@@ -22,7 +18,7 @@ import {
   Scissors,
   Trophy
 } from 'lucide-react';
-import { CATEGORIES, BUY_PRODUCTS, RENT_PRODUCTS } from '../data/products';
+import { CATEGORIES, BUY_PRODUCTS } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import ItemDetailModal from '../components/ItemDetailModal';
 
@@ -41,197 +37,135 @@ export default function MainWindow({ buyProducts, onBuyItem, onRentItem }) {
     }
   };
 
-  // Category Icon & Color Mapping
-  const getCategoryMeta = (category) => {
+  const getCategoryIcon = (category) => {
     switch (category) {
-      case 'Clothing':
-        return { icon: Shirt, color: 'text-pink-600 bg-pink-50 hover:border-pink-200' };
-      case 'Electronics':
-        return { icon: Laptop, color: 'text-blue-600 bg-blue-50 hover:border-blue-200' };
-      case 'Notes':
-        return { icon: BookOpen, color: 'text-purple-600 bg-purple-50 hover:border-purple-200' };
-      case 'Printouts':
-        return { icon: FileText, color: 'text-indigo-600 bg-indigo-50 hover:border-indigo-200' };
-      case 'Groceries':
-        return { icon: Apple, color: 'text-amber-600 bg-amber-50 hover:border-amber-200' };
-      case 'Stationery':
-        return { icon: PenTool, color: 'text-teal-600 bg-teal-50 hover:border-teal-200' };
-      case 'Hostel Decor':
-        return { icon: Home, color: 'text-rose-600 bg-rose-50 hover:border-rose-200' };
-      case 'Utensils':
-        return { icon: Coffee, color: 'text-orange-600 bg-orange-50 hover:border-orange-200' };
-      case 'Skincare':
-        return { icon: Smile, color: 'text-emerald-600 bg-emerald-50 hover:border-emerald-200' };
-      case 'Haircare':
-        return { icon: Scissors, color: 'text-cyan-600 bg-cyan-50 hover:border-cyan-200' };
-      case 'Sports Items':
-        return { icon: Trophy, color: 'text-violet-600 bg-violet-50 hover:border-violet-200' };
-      default:
-        return { icon: Sparkles, color: 'text-purple-600 bg-purple-50 hover:border-purple-200' };
+      case 'Clothing': return Shirt;
+      case 'Electronics': return Laptop;
+      case 'Notes': return BookOpen;
+      case 'Printouts': return FileText;
+      case 'Groceries': return Apple;
+      case 'Stationery': return PenTool;
+      case 'Hostel Decor': return Home;
+      case 'Utensils': return Coffee;
+      case 'Skincare': return Smile;
+      case 'Haircare': return Scissors;
+      case 'Sports Items': return Trophy;
+      default: return ShoppingBag;
     }
   };
 
   const recentProducts = (buyProducts || BUY_PRODUCTS).slice(0, 8);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-50">
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-purple-50/70 via-slate-50 to-white pt-10 pb-16 border-b border-slate-200/60">
-        {/* Decorative background glow circles */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-300/20 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            
-            {/* Campus Tag */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold tracking-wide">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>COLLEGE HOSTEL & CAMPUS TRADING HUB</span>
+      <section className="bg-white border-b border-slate-200 py-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-4">
+          
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
+            Buy, Sell, and Rent on Campus
+          </h1>
+
+          <p className="text-sm text-slate-500 max-w-xl mx-auto">
+            Trade textbooks, calculators, room appliances, and cycles with students in your dorms.
+          </p>
+
+          {/* Search Box */}
+          <form onSubmit={handleHeroSearch} className="max-w-lg mx-auto pt-2">
+            <div className="flex items-center bg-slate-50 border border-slate-300 rounded-lg p-1 focus-within:border-purple-700 focus-within:bg-white transition-colors">
+              <Search className="w-4 h-4 text-slate-400 ml-3 shrink-0" />
+              <input
+                type="text"
+                placeholder="Search items (e.g. calculator, notes, kettle)..."
+                value={heroSearch}
+                onChange={(e) => setHeroSearch(e.target.value)}
+                className="w-full px-3 py-2 text-sm text-slate-800 bg-transparent placeholder-slate-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-md transition-colors shrink-0"
+              >
+                Search
+              </button>
             </div>
+          </form>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-              Buy, Sell & Rent <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600">
-                Inside Your Campus
-              </span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Don't let college essentials break your budget. Trade gently used calculators, notes, cycles, kettles, and decor with fellow students.
-            </p>
-
-            {/* Hero Search Bar */}
-            <form onSubmit={handleHeroSearch} className="pt-2 max-w-xl mx-auto">
-              <div className="relative flex items-center bg-white rounded-2xl p-1.5 shadow-lg shadow-purple-500/10 border border-slate-200 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-200 transition-all">
-                <Search className="w-5 h-5 text-slate-400 ml-3.5 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="What are you looking for? (e.g. Drafter, Notes, Kettle)"
-                  value={heroSearch}
-                  onChange={(e) => setHeroSearch(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm sm:text-base text-slate-800 bg-transparent placeholder-slate-400 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm rounded-xl transition-all shadow-sm shrink-0"
-                >
-                  Search
-                </button>
+          {/* 3 Action Pillars */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 max-w-3xl mx-auto text-left">
+            <Link
+              to="/buy"
+              className="p-4 bg-slate-50 border border-slate-200 rounded-lg hover:border-purple-600 transition-colors flex flex-col justify-between"
+            >
+              <div>
+                <div className="text-purple-700 mb-2">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-900">Buy Items</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Pre-owned campus essentials.</p>
               </div>
-            </form>
+              <span className="text-xs font-medium text-purple-700 mt-3 inline-flex items-center gap-1">
+                Browse catalog <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Link>
 
-            {/* Three Core Hub Pillars Navigation */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
-              {/* Buy Card */}
-              <Link
-                to="/buy"
-                className="group p-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <ShoppingBag className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                    Buy Products
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Browse verified college essentials, notes, gadgets, and decor with 14-day fresh listings.
-                  </p>
+            <Link
+              to="/rent"
+              className="p-4 bg-slate-50 border border-slate-200 rounded-lg hover:border-purple-600 transition-colors flex flex-col justify-between"
+            >
+              <div>
+                <div className="text-purple-700 mb-2">
+                  <Repeat className="w-5 h-5" />
                 </div>
-                <div className="mt-4 flex items-center text-xs font-semibold text-purple-600 group-hover:translate-x-1 transition-transform">
-                  <span>Explore Market</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </div>
-              </Link>
+                <h3 className="text-sm font-semibold text-slate-900">Rent for Days</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Short-term gear and exam tools.</p>
+              </div>
+              <span className="text-xs font-medium text-purple-700 mt-3 inline-flex items-center gap-1">
+                View rentals <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Link>
 
-              {/* Rent Card */}
-              <Link
-                to="/rent"
-                className="group p-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <Repeat className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                    Rent for Days
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Need a drafter for tomorrow's exam or a suit for interview? Fast 2-day rental listings.
-                  </p>
+            <Link
+              to="/sell"
+              className="p-4 bg-slate-50 border border-slate-200 rounded-lg hover:border-purple-600 transition-colors flex flex-col justify-between"
+            >
+              <div>
+                <div className="text-purple-700 mb-2">
+                  <Plus className="w-5 h-5" />
                 </div>
-                <div className="mt-4 flex items-center text-xs font-semibold text-purple-600 group-hover:translate-x-1 transition-transform">
-                  <span>View Rentals</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </div>
-              </Link>
-
-              {/* Sell Card */}
-              <Link
-                to="/sell"
-                className="group p-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-purple-300 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <PlusCircle className="w-6 h-6" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                    Sell Unused Stuff
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Declutter your hostel room! Upload 3+ photos and get cash in your pocket in minutes.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center text-xs font-semibold text-purple-600 group-hover:translate-x-1 transition-transform">
-                  <span>List an Item</span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </div>
-              </Link>
-            </div>
-
+                <h3 className="text-sm font-semibold text-slate-900">Sell Products</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Post an item in under 2 minutes.</p>
+              </div>
+              <span className="text-xs font-medium text-purple-700 mt-3 inline-flex items-center gap-1">
+                Post listing <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Link>
           </div>
+
         </div>
       </section>
 
-      {/* Product Categories Section */}
-      <section className="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-purple-600">Explore by Category</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-0.5">
-              Campus Marketplace Categories
-            </h2>
-          </div>
-          <Link
-            to="/buy"
-            className="inline-flex items-center text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors"
-          >
-            <span>View All Categories</span>
-            <ChevronRight className="w-4 h-4 ml-0.5" />
+      {/* Categories Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-bold text-slate-900">Categories</h2>
+          <Link to="/buy" className="text-xs font-medium text-purple-700 hover:underline">
+            View all
           </Link>
         </div>
 
-        {/* Categories Grid (11 Required Categories) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2">
           {CATEGORIES.map((category) => {
-            const meta = getCategoryMeta(category);
-            const IconComponent = meta.icon;
+            const Icon = getCategoryIcon(category);
             return (
               <Link
                 key={category}
                 to={`/buy?category=${encodeURIComponent(category)}`}
-                className={`p-4 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col items-center text-center group ${meta.color}`}
+                className="p-3 bg-white border border-slate-200 rounded-lg hover:border-purple-600 transition-colors flex flex-col items-center text-center group"
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-2.5 transition-transform group-hover:scale-110">
-                  <IconComponent className="w-6 h-6" />
-                </div>
-                <span className="text-xs font-bold text-slate-800 group-hover:text-purple-700 transition-colors line-clamp-1">
+                <Icon className="w-5 h-5 text-slate-600 group-hover:text-purple-700 transition-colors mb-1.5" />
+                <span className="text-[11px] font-medium text-slate-700 group-hover:text-slate-900 line-clamp-1">
                   {category}
-                </span>
-                <span className="text-[10px] text-slate-400 mt-0.5">
-                  Browse items
                 </span>
               </Link>
             );
@@ -239,83 +173,56 @@ export default function MainWindow({ buyProducts, onBuyItem, onRentItem }) {
         </div>
       </section>
 
-      {/* Recently Listed Products Section */}
-      <section className="py-12 bg-slate-100/60 border-y border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-700 text-xs font-semibold mb-1">
-                <Clock className="w-3.5 h-3.5" />
-                <span>14-Day Fresh Postings</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                Recently Listed Products
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Freshly uploaded by students across campus hostels today
-              </p>
-            </div>
-            
-            <Link
-              to="/buy"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-purple-700 text-sm font-semibold rounded-xl shadow-xs transition-colors"
-            >
-              <span>See All Buy Listings</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+      {/* Recent Listings */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">Recent Listings</h2>
+            <p className="text-xs text-slate-500">Active 14-day student posts</p>
           </div>
+          <Link
+            to="/buy"
+            className="text-xs font-medium text-purple-700 hover:underline"
+          >
+            See all buy items &rarr;
+          </Link>
+        </div>
 
-          {/* Product Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {recentProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                mode="buy"
-                onViewDetails={(item) => {
-                  setSelectedProduct(item);
-                  setModalMode('buy');
-                }}
-                onAction={(item) => {
-                  if (onBuyItem) onBuyItem(item);
-                }}
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {recentProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              mode="buy"
+              onViewDetails={(item) => {
+                setSelectedProduct(item);
+                setModalMode('buy');
+              }}
+              onAction={(item) => {
+                if (onBuyItem) onBuyItem(item);
+              }}
+            />
+          ))}
         </div>
       </section>
 
-      {/* Rental Spotlight Section */}
-      <section className="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-tr from-purple-900 via-purple-800 to-indigo-900 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl">
-          {/* Subtle background circles */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10 max-w-2xl">
-            <span className="px-3 py-1 rounded-full bg-white/20 text-purple-200 text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
-              Campus Rental Hub
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mt-4 leading-tight">
-              Why buy when you only need it for exams or the weekend?
-            </h2>
-            <p className="mt-3 text-purple-100 text-sm sm:text-base leading-relaxed">
-              DormDeal rental listings have a 2-day listing cycle. Borrow mini drafters, blazers for mock interviews, bicycles, or camping gear at nominal rates.
+      {/* Simple Rental Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
+        <div className="bg-slate-100 border border-slate-200 rounded-xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-slate-900">
+              Need items for only a few days?
+            </h3>
+            <p className="text-xs text-slate-600">
+              Browse student rentals for mini drafters, placement blazers, and cycles on 2-day cycles.
             </p>
-            
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link
-                to="/rent"
-                className="px-6 py-3 bg-white hover:bg-purple-50 text-purple-900 font-bold rounded-xl text-sm transition-all shadow-md"
-              >
-                Browse Rentals (from ₹40/day)
-              </Link>
-              <Link
-                to="/sell"
-                className="px-6 py-3 bg-purple-700/80 hover:bg-purple-700 text-white border border-purple-400/40 font-semibold rounded-xl text-sm transition-all"
-              >
-                List an Item
-              </Link>
-            </div>
           </div>
+          <Link
+            to="/rent"
+            className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg transition-colors shrink-0"
+          >
+            Browse Rentals
+          </Link>
         </div>
       </section>
 
@@ -333,4 +240,3 @@ export default function MainWindow({ buyProducts, onBuyItem, onRentItem }) {
     </div>
   );
 }
-

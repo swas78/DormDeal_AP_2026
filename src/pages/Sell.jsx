@@ -1,24 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Upload, 
-  X, 
-  Sparkles, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
-  HelpCircle, 
-  Plus, 
-  ShieldCheck,
-  ImageIcon,
-  ArrowRight
-} from 'lucide-react';
+import { Upload, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { CATEGORIES } from '../data/products';
 
 export default function Sell({ onAddNewProduct }) {
   const navigate = useNavigate();
 
-  // Form State
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -32,23 +19,17 @@ export default function Sell({ onAddNewProduct }) {
     condition: 'Like New'
   });
 
-  // Images State (Minimum 3 required)
   const [photos, setPhotos] = useState([]);
-  
-  // Validation Errors
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
-  const [createdProductId, setCreatedProductId] = useState(null);
 
-  // Preset sample photo bundles for quick testing
   const samplePhotoPresets = [
     'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80'
   ];
 
-  // Handle Photo Upload via file input
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -56,13 +37,11 @@ export default function Sell({ onAddNewProduct }) {
     const newPhotoUrls = files.map((file) => URL.createObjectURL(file));
     setPhotos((prev) => [...prev, ...newPhotoUrls]);
 
-    // Clear photo error if >= 3
     if (photos.length + newPhotoUrls.length >= 3) {
       setErrors((prev) => ({ ...prev, photos: null }));
     }
   };
 
-  // Quick fill sample photos
   const handleAddSamplePhotos = () => {
     setPhotos(samplePhotoPresets);
     setErrors((prev) => ({ ...prev, photos: null }));
@@ -72,62 +51,56 @@ export default function Sell({ onAddNewProduct }) {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Form Field Change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error as user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
-  // Validation
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Item name is required.';
     } else if (formData.name.trim().length < 3) {
-      newErrors.name = 'Item name must be at least 3 characters.';
+      newErrors.name = 'Must be at least 3 characters.';
     }
 
     if (!formData.category) {
-      newErrors.category = 'Please select a product category.';
+      newErrors.category = 'Please select a category.';
     }
 
     if (!formData.price) {
       newErrors.price = 'Price is required.';
     } else if (isNaN(formData.price) || Number(formData.price) <= 0) {
-      newErrors.price = 'Please enter a valid price greater than ₹0.';
+      newErrors.price = 'Please enter a valid price.';
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Item description is required.';
+      newErrors.description = 'Description is required.';
     } else if (formData.description.trim().length < 10) {
-      newErrors.description = 'Please write at least 10 characters to describe the item.';
+      newErrors.description = 'Please write at least 10 characters.';
     }
 
-    // Requirement: Minimum 3 product photos
     if (photos.length < 3) {
-      newErrors.photos = `Please provide at least 3 product photos (${photos.length}/3 provided).`;
+      newErrors.photos = `Minimum 3 photos required (${photos.length}/3 provided).`;
     }
 
     if (formData.defects === 'yes' && !formData.defectDetails.trim()) {
-      newErrors.defectDetails = 'Please briefly specify the defects.';
+      newErrors.defectDetails = 'Please specify the defects.';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit Handler
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      // Scroll to first error
-      window.scrollTo({ top: 120, behavior: 'smooth' });
+      window.scrollTo({ top: 50, behavior: 'smooth' });
       return;
     }
 
@@ -143,7 +116,7 @@ export default function Sell({ onAddNewProduct }) {
       images: photos,
       description: formData.description.trim(),
       seller: {
-        name: 'You (Hostel Resident)',
+        name: 'You (Student)',
         hostel: formData.hostel || 'Hostel Campus Room',
         year: 'Current Student',
         rating: 5.0,
@@ -153,20 +126,16 @@ export default function Sell({ onAddNewProduct }) {
       listedDate: 'Just now',
       openToBargaining: formData.openToBargaining === 'yes',
       defects: formData.defects === 'yes',
-      defectDetails: formData.defects === 'yes' ? formData.defectDetails.trim() : 'None reported'
+      defectDetails: formData.defects === 'yes' ? formData.defectDetails.trim() : 'None'
     };
 
     setTimeout(() => {
-      if (onAddNewProduct) {
-        onAddNewProduct(newProduct);
-      }
+      if (onAddNewProduct) onAddNewProduct(newProduct);
       setIsSubmitting(false);
-      setCreatedProductId(newProduct.id);
       setSubmittedSuccessfully(true);
-    }, 600);
+    }, 400);
   };
 
-  // Reset form to list another
   const handleResetForNew = () => {
     setFormData({
       name: '',
@@ -183,193 +152,129 @@ export default function Sell({ onAddNewProduct }) {
     setPhotos([]);
     setErrors({});
     setSubmittedSuccessfully(false);
-    setCreatedProductId(null);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
         
-        {/* Breadcrumb / Top Tag */}
-        <div className="mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-lg uppercase tracking-wide">
-            <Sparkles className="w-3.5 h-3.5" />
-            Sell on Campus
-          </span>
-        </div>
-
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Create a New Product Listing
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-slate-900">
+            List an Item for Sale
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Turn your unused notes, appliances, cycle, or clothes into quick cash.
+          <p className="text-xs text-slate-500 mt-1">
+            Selling listings stay active on campus for <strong>14 days</strong>.
           </p>
-
-          {/* 14-Day Duration Highlight Banner */}
-          <div className="mt-4 p-4 bg-purple-50 border border-purple-200/80 rounded-2xl flex items-start gap-3">
-            <Clock className="w-5 h-5 text-purple-700 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-purple-900">
-                14-Day Listing Duration
-              </h4>
-              <p className="text-xs text-purple-700 mt-0.5 leading-relaxed">
-                In accordance with DormDeal campus rules, all selling listings remain active for <strong>14 days</strong>. You can renew or mark as sold anytime.
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Success Modal / Banner */}
         {submittedSuccessfully ? (
-          <div className="bg-white rounded-3xl border border-emerald-200 p-8 shadow-sm text-center animate-in fade-in duration-300">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900">Listing Published!</h2>
-            <p className="text-sm text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
-              Your item <strong>"{formData.name}"</strong> is now live on the DormDeal campus marketplace with a <strong>14-day listing duration</strong>.
+          <div className="bg-white rounded-lg border border-slate-200 p-6 text-center">
+            <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-3" />
+            <h2 className="text-lg font-bold text-slate-900">Listing Published</h2>
+            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              "{formData.name}" is now live for 14 days on the marketplace.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-6 flex items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => navigate('/buy')}
-                className="w-full sm:w-auto px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-xl shadow-sm transition-all"
+                className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded"
               >
                 View in Buy Feed
               </button>
               <button
                 type="button"
                 onClick={handleResetForNew}
-                className="w-full sm:w-auto px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded"
               >
                 List Another Item
               </button>
             </div>
           </div>
         ) : (
-          /* The Form */
-          <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-slate-200 p-6 space-y-5">
             
-            {/* 1. Item Name */}
+            {/* Item Name */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Item Name <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Item Name *
               </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="e.g. Casio fx-991EX Scientific Calculator"
-                className={`w-full px-4 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                  errors.name 
-                    ? 'border-rose-400 focus:ring-rose-200' 
-                    : 'border-slate-200 focus:ring-purple-200 focus:border-purple-600'
+                placeholder="e.g. Casio Scientific Calculator fx-991EX"
+                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded focus:bg-white focus:outline-none ${
+                  errors.name ? 'border-rose-400' : 'border-slate-200 focus:border-purple-600'
                 }`}
               />
               {errors.name && (
                 <p className="mt-1 text-xs text-rose-500 flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  {errors.name}
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.name}
                 </p>
               )}
             </div>
 
-            {/* 2. Item Category & Condition (Grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Category */}
+            {/* Category & Condition */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Item Category <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Category *
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all cursor-pointer ${
-                    errors.category 
-                      ? 'border-rose-400 focus:ring-rose-200' 
-                      : 'border-slate-200 focus:ring-purple-200 focus:border-purple-600'
+                  className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded focus:bg-white focus:outline-none cursor-pointer ${
+                    errors.category ? 'border-rose-400' : 'border-slate-200 focus:border-purple-600'
                   }`}
                 >
-                  <option value="">Select a category</option>
+                  <option value="">Select category</option>
                   {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
+                    <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="mt-1 text-xs text-rose-500 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {errors.category}
-                  </p>
+                  <p className="mt-1 text-xs text-rose-500">{errors.category}</p>
                 )}
               </div>
 
-              {/* Condition */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Condition <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Condition *
                 </label>
                 <select
                   name="condition"
                   value={formData.condition}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-600 focus:bg-white transition-all cursor-pointer"
+                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded focus:bg-white focus:outline-none focus:border-purple-600 cursor-pointer"
                 >
-                  <option value="Brand New">Brand New (Unused / Sealed)</option>
-                  <option value="Like New">Like New (Mint Condition)</option>
-                  <option value="Good">Good (Minor cosmetic signs)</option>
-                  <option value="Fair">Fair (Fully functional with wear)</option>
+                  <option value="Brand New">Brand New</option>
+                  <option value="Like New">Like New</option>
+                  <option value="Good">Good</option>
+                  <option value="Fair">Fair</option>
                 </select>
               </div>
             </div>
 
-            {/* 3. Product Photos (Requirement: Minimum 3 Photos) */}
+            {/* Photos (Min 3) */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Product Photos <span className="text-rose-500">*</span>
-                  <span className="ml-1 text-slate-400 font-normal">
-                    (Minimum 3 required)
-                  </span>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700">
+                  Photos * <span className="text-slate-400 font-normal">(Min 3 required)</span>
                 </label>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${
-                  photos.length >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-purple-100 text-purple-700'
-                }`}>
-                  {photos.length} / 3 Photos
-                </span>
+                <span className="text-xs text-slate-500 font-medium">{photos.length}/3</span>
               </div>
 
-              {/* Upload Drop Area */}
-              <div className={`p-5 rounded-2xl border-2 border-dashed transition-all ${
-                errors.photos 
-                  ? 'border-rose-300 bg-rose-50/40' 
-                  : 'border-purple-200 bg-purple-50/30 hover:border-purple-400'
-              }`}>
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                      <Upload className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">
-                        Upload real photos from your phone or device
-                      </p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        Clear photos from multiple angles help college students buy faster.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Real file upload button */}
-                    <label className="cursor-pointer px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-colors shadow-xs">
-                      <span>Choose Files</span>
+              <div className="p-4 border border-dashed border-slate-300 rounded bg-slate-50">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-slate-500">Upload at least 3 photos:</span>
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium rounded">
+                      Choose Files
                       <input
                         type="file"
                         multiple
@@ -378,36 +283,28 @@ export default function Sell({ onAddNewProduct }) {
                         className="hidden"
                       />
                     </label>
-
-                    {/* Quick test sample photos */}
                     <button
                       type="button"
                       onClick={handleAddSamplePhotos}
-                      className="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
-                      title="Quickly fill 3 sample photos for testing"
+                      className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs rounded hover:bg-slate-50"
                     >
                       Use 3 Samples
                     </button>
                   </div>
                 </div>
 
-                {/* Photo Previews */}
                 {photos.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-purple-100 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                  <div className="mt-3 grid grid-cols-4 gap-2">
                     {photos.map((url, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white group shadow-xs">
-                        <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                      <div key={idx} className="relative aspect-square rounded border border-slate-200 bg-white overflow-hidden">
+                        <img src={url} alt={`upload-${idx}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => handleRemovePhoto(idx)}
-                          className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/70 hover:bg-rose-600 text-white transition-colors"
-                          title="Remove photo"
+                          className="absolute top-1 right-1 p-0.5 rounded bg-black/60 text-white"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-3 h-3" />
                         </button>
-                        <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-slate-900/60 rounded text-[9px] font-bold text-white">
-                          #{idx + 1}
-                        </span>
                       </div>
                     ))}
                   </div>
@@ -415,208 +312,170 @@ export default function Sell({ onAddNewProduct }) {
               </div>
 
               {errors.photos && (
-                <p className="mt-1.5 text-xs text-rose-500 flex items-center gap-1 font-medium">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  {errors.photos}
-                </p>
+                <p className="mt-1 text-xs text-rose-500">{errors.photos}</p>
               )}
             </div>
 
-            {/* 4. Price and Original Price (Grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Selling Price */}
+            {/* Price */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Selling Price (₹) <span className="text-rose-500">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Price (₹) *
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
-                  <input
-                    type="number"
-                    name="price"
-                    min="1"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="450"
-                    className={`w-full pl-8 pr-4 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                      errors.price 
-                        ? 'border-rose-400 focus:ring-rose-200' 
-                        : 'border-slate-200 focus:ring-purple-200 focus:border-purple-600'
-                    }`}
-                  />
-                </div>
+                <input
+                  type="number"
+                  name="price"
+                  min="1"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="450"
+                  className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded focus:bg-white focus:outline-none ${
+                    errors.price ? 'border-rose-400' : 'border-slate-200 focus:border-purple-600'
+                  }`}
+                />
                 {errors.price && (
-                  <p className="mt-1 text-xs text-rose-500 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {errors.price}
-                  </p>
+                  <p className="mt-1 text-xs text-rose-500">{errors.price}</p>
                 )}
               </div>
 
-              {/* Original Purchase Price (Optional) */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Original MRP / Price (₹) <span className="text-slate-400 font-normal">(Optional)</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Original Price (₹) <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
-                  <input
-                    type="number"
-                    name="originalPrice"
-                    min="1"
-                    value={formData.originalPrice}
-                    onChange={handleChange}
-                    placeholder="899"
-                    className="w-full pl-8 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-600 focus:bg-white transition-all"
-                  />
-                </div>
+                <input
+                  type="number"
+                  name="originalPrice"
+                  min="1"
+                  value={formData.originalPrice}
+                  onChange={handleChange}
+                  placeholder="899"
+                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded focus:bg-white focus:outline-none focus:border-purple-600"
+                />
               </div>
             </div>
 
-            {/* 5. Description */}
+            {/* Description */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Item Description <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Description *
               </label>
               <textarea
                 name="description"
-                rows="4"
+                rows="3"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe condition, semester/year used, reason for selling, accessories included..."
-                className={`w-full px-4 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                  errors.description 
-                    ? 'border-rose-400 focus:ring-rose-200' 
-                    : 'border-slate-200 focus:ring-purple-200 focus:border-purple-600'
+                placeholder="Mention condition, usage duration, and included items..."
+                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded focus:bg-white focus:outline-none ${
+                  errors.description ? 'border-rose-400' : 'border-slate-200 focus:border-purple-600'
                 }`}
               />
               {errors.description && (
-                <p className="mt-1 text-xs text-rose-500 flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  {errors.description}
-                </p>
+                <p className="mt-1 text-xs text-rose-500">{errors.description}</p>
               )}
             </div>
 
-            {/* 6. Open to Bargaining (Yes/No) */}
-            <div className="pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Open to Bargaining? <span className="text-rose-500">*</span>
-              </label>
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="openToBargaining"
-                    value="yes"
-                    checked={formData.openToBargaining === 'yes'}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm font-medium text-slate-700">Yes, open to reasonable offers</span>
+            {/* Bargain & Defects */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Open to Bargaining? *
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="openToBargaining"
-                    value="no"
-                    checked={formData.openToBargaining === 'no'}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm font-medium text-slate-700">No, fixed price</span>
-                </label>
-              </div>
-            </div>
-
-            {/* 7. Any Defects (Yes/No) */}
-            <div className="pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Any Defects or Damages? <span className="text-rose-500">*</span>
-              </label>
-              <div className="flex items-center gap-6 mb-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="defects"
-                    value="no"
-                    checked={formData.defects === 'no'}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm font-medium text-slate-700">No defects (fully functional)</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="defects"
-                    value="yes"
-                    checked={formData.defects === 'yes'}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm font-medium text-slate-700">Yes, has minor defects</span>
-                </label>
-              </div>
-
-              {/* Conditional Defect Details input */}
-              {formData.defects === 'yes' && (
-                <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-2xl animate-in fade-in duration-200">
-                  <label className="block text-xs font-bold text-amber-900 mb-1">
-                    Describe the defect transparently <span className="text-rose-500">*</span>
+                <div className="flex items-center gap-4 text-xs text-slate-700">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="openToBargaining"
+                      value="yes"
+                      checked={formData.openToBargaining === 'yes'}
+                      onChange={handleChange}
+                    />
+                    <span>Yes</span>
                   </label>
-                  <input
-                    type="text"
-                    name="defectDetails"
-                    value={formData.defectDetails}
-                    onChange={handleChange}
-                    placeholder="e.g. Minor scratch on outer cover, battery lasts 4 hours instead of 6..."
-                    className="w-full px-3.5 py-2 text-xs sm:text-sm bg-white border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-200"
-                  />
-                  {errors.defectDetails && (
-                    <p className="mt-1 text-xs text-rose-500 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {errors.defectDetails}
-                    </p>
-                  )}
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="openToBargaining"
+                      value="no"
+                      checked={formData.openToBargaining === 'no'}
+                      onChange={handleChange}
+                    />
+                    <span>No (Fixed)</span>
+                  </label>
                 </div>
-              )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Any Defects? *
+                </label>
+                <div className="flex items-center gap-4 text-xs text-slate-700">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="defects"
+                      value="no"
+                      checked={formData.defects === 'no'}
+                      onChange={handleChange}
+                    />
+                    <span>No</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="defects"
+                      value="yes"
+                      checked={formData.defects === 'yes'}
+                      onChange={handleChange}
+                    />
+                    <span>Yes</span>
+                  </label>
+                </div>
+              </div>
             </div>
+
+            {formData.defects === 'yes' && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Specify defects:
+                </label>
+                <input
+                  type="text"
+                  name="defectDetails"
+                  value={formData.defectDetails}
+                  onChange={handleChange}
+                  placeholder="e.g. Scratched screen, missing box..."
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded focus:bg-white focus:outline-none focus:border-purple-600"
+                />
+                {errors.defectDetails && (
+                  <p className="mt-1 text-xs text-rose-500">{errors.defectDetails}</p>
+                )}
+              </div>
+            )}
 
             {/* Hostel Location */}
             <div className="pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Pickup Location (Hostel & Room)
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Pickup Location
               </label>
               <input
                 type="text"
                 name="hostel"
                 value={formData.hostel}
                 onChange={handleChange}
-                placeholder="e.g. Block B - Room 204 or Campus Central Library"
-                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-600 focus:bg-white transition-all"
+                placeholder="e.g. Block B, Room 204"
+                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded focus:bg-white focus:outline-none focus:border-purple-600"
               />
             </div>
 
-            {/* 8. Submit Listing Button */}
-            <div className="pt-4 border-t border-slate-100">
+            {/* Submit */}
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-6 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-purple-500/25 transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 bg-purple-700 hover:bg-purple-800 disabled:bg-purple-300 text-white font-semibold text-sm rounded transition-colors"
               >
-                {isSubmitting ? (
-                  <span>Publishing Listing...</span>
-                ) : (
-                  <>
-                    <span>Submit Listing (14-Day Duration)</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
+                {isSubmitting ? 'Posting...' : 'Submit Listing (14 Days)'}
               </button>
-              <p className="text-[11px] text-slate-400 text-center mt-2.5">
-                By submitting, you agree to DormDeal campus peer-to-peer trading terms.
-              </p>
             </div>
 
           </form>
@@ -626,4 +485,3 @@ export default function Sell({ onAddNewProduct }) {
     </div>
   );
 }
-
