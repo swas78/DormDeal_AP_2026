@@ -70,27 +70,32 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Simple Page Header */}
-        <div className="mb-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Buy Campus Items
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Browse available listings from students across hostels.
-          </p>
+        {/* Simple Intentional Header */}
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Buy Campus Items
+            </h1>
+            <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              Direct student listings across campus hostels • 14-day duration
+            </p>
+          </div>
+          <span className="text-xs font-mono text-zinc-500">
+            Showing {filteredProducts.length} listings
+          </span>
         </div>
 
         {/* Controls: Search & Sort */}
-        <div className="bg-white p-3 rounded-lg border border-slate-200 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           
           <div className="relative w-full sm:max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search items..."
+              placeholder="Search items, sellers, or hostels..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -101,7 +106,7 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
                 }
                 setSearchParams(searchParams);
               }}
-              className="w-full pl-9 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded focus:outline-none focus:bg-white focus:border-purple-600"
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono"
             />
             {searchQuery && (
               <button
@@ -110,9 +115,9 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
                   searchParams.delete('search');
                   setSearchParams(searchParams);
                 }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
@@ -120,22 +125,22 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
           <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2">
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="lg:hidden flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 text-slate-700 text-xs font-medium rounded"
+              className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800 text-zinc-200 text-xs font-mono rounded border border-zinc-700"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-400" />
               <span>Filters ({filteredProducts.length})</span>
             </button>
 
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded px-2 py-1">
-              <span className="text-xs text-slate-400">Sort:</span>
+            <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded px-2 py-1">
+              <span className="text-[11px] font-mono text-zinc-500">SORT:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-xs text-slate-700 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-mono text-zinc-300 focus:outline-none cursor-pointer"
               >
-                <option value="newest">Newest</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
+                <option value="newest" className="bg-zinc-900 text-zinc-200">Newest</option>
+                <option value="price-asc" className="bg-zinc-900 text-zinc-200">Price: Low to High</option>
+                <option value="price-desc" className="bg-zinc-900 text-zinc-200">Price: High to Low</option>
               </select>
             </div>
           </div>
@@ -143,47 +148,47 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
 
         {/* Active Filter Chips */}
         {(selectedCategory !== 'All' || selectedCondition !== 'All' || searchQuery || priceRange.min > 0 || priceRange.max < 2000) && (
-          <div className="flex flex-wrap items-center gap-1.5 mb-4 text-xs">
-            <span className="text-slate-400 mr-1">Active:</span>
+          <div className="flex flex-wrap items-center gap-1.5 mb-4 text-xs font-mono">
+            <span className="text-zinc-500 mr-1">Active:</span>
             
             {selectedCategory !== 'All' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900 text-emerald-400 border border-zinc-700 rounded text-[11px]">
                 Category: {selectedCategory}
-                <button onClick={() => handleCategorySelect('All')}>
+                <button onClick={() => handleCategorySelect('All')} className="hover:text-white">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
 
             {selectedCondition !== 'All' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900 text-emerald-400 border border-zinc-700 rounded text-[11px]">
                 Condition: {selectedCondition}
-                <button onClick={() => setSelectedCondition('All')}>
+                <button onClick={() => setSelectedCondition('All')} className="hover:text-white">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
 
             {(priceRange.min > 0 || priceRange.max < 2000) && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded">
-                ₹{priceRange.min} - ₹{priceRange.max}
-                <button onClick={() => setPriceRange({ min: 0, max: 2000 })}>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900 text-emerald-400 border border-zinc-700 rounded text-[11px]">
+                ₹{priceRange.min}-₹{priceRange.max}
+                <button onClick={() => setPriceRange({ min: 0, max: 2000 })} className="hover:text-white">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
 
             {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900 text-emerald-400 border border-zinc-700 rounded text-[11px]">
                 "{searchQuery}"
-                <button onClick={() => { setSearchQuery(''); searchParams.delete('search'); setSearchParams(searchParams); }}>
+                <button onClick={() => { setSearchQuery(''); searchParams.delete('search'); setSearchParams(searchParams); }} className="hover:text-white">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
 
-            <button onClick={handleResetFilters} className="text-slate-500 hover:underline ml-1">
-              Reset all
+            <button onClick={handleResetFilters} className="text-zinc-400 hover:text-white underline ml-1 text-[11px]">
+              Clear all
             </button>
           </div>
         )}
@@ -206,16 +211,16 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
 
           <main className="flex-1 min-w-0">
             {filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center max-w-sm mx-auto my-6">
-                <Inbox className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <h3 className="text-sm font-semibold text-slate-800">No items found</h3>
-                <p className="text-xs text-slate-400 mt-1">Try resetting your search or filters.</p>
+              <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-8 text-center max-w-sm mx-auto my-6">
+                <Inbox className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
+                <h3 className="text-sm font-semibold text-zinc-200">No items match your criteria</h3>
+                <p className="text-xs text-zinc-500 font-mono mt-1">Try widening your price range or clearing filters.</p>
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="mt-3 px-3 py-1.5 bg-purple-700 text-white text-xs font-medium rounded"
+                  className="mt-3 px-3 py-1.5 bg-emerald-500 text-zinc-950 text-xs font-bold rounded"
                 >
-                  Clear filters
+                  Clear all filters
                 </button>
               </div>
             ) : (

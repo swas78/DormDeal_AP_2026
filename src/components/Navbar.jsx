@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, Plus, Menu, X, ShoppingBag } from 'lucide-react';
+import { Search, Plus, Menu, X, ArrowUpRight } from 'lucide-react';
 
 export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,42 +18,47 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
   };
 
   const navLinkClasses = ({ isActive }) =>
-    `px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+    `px-3 py-1.5 text-xs uppercase tracking-wider font-semibold rounded-md transition-colors ${
       isActive
-        ? 'text-purple-700 bg-purple-50 font-semibold'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+        ? 'text-emerald-400 bg-zinc-900'
+        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
     }`;
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <header className="bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800/80 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-6">
+        <div className="flex items-center justify-between h-14 gap-6">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-purple-700 flex items-center justify-center text-white">
-              <ShoppingBag className="w-4 h-4" />
+          {/* Logo with intentional typography & Emerald mark */}
+          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+            <div className="w-7 h-7 rounded-md bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-sm tracking-tighter shadow-sm shadow-emerald-500/20 group-hover:bg-emerald-400 transition-colors">
+              D
             </div>
-            <span className="text-lg font-bold text-slate-900 tracking-tight">
-              Dorm<span className="text-purple-700">Deal</span>
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-base font-black tracking-tight text-white">
+                Dorm<span className="text-emerald-400">Deal</span>
+              </span>
+              <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
+                /CAMPUS
+              </span>
+            </div>
           </Link>
 
-          {/* Search Bar */}
+          {/* Search Bar with intentional high-contrast dark styling */}
           <form 
             onSubmit={handleSearchSubmit} 
             className="hidden md:flex flex-1 max-w-md relative"
           >
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search products, notes, gadgets..."
+              placeholder="Search notes, kettles, cycles, calculators..."
               value={localSearch}
               onChange={(e) => {
                 setLocalSearch(e.target.value);
                 if (setSearchQuery) setSearchQuery(e.target.value);
               }}
-              className="w-full pl-9 pr-8 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:border-purple-600 transition-colors"
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-md text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/70 focus:ring-1 focus:ring-emerald-500/30 transition-all font-mono"
             />
             {localSearch && (
               <button
@@ -62,9 +67,9 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
                   setLocalSearch('');
                   if (setSearchQuery) setSearchQuery('');
                 }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </form>
@@ -72,7 +77,7 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1">
             <NavLink to="/" end className={navLinkClasses}>
-              Main Window
+              Main
             </NavLink>
             <NavLink to="/buy" className={navLinkClasses}>
               Buy
@@ -85,22 +90,23 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
             </NavLink>
           </nav>
 
-          {/* Action Button */}
-          <div className="hidden sm:flex items-center">
+          {/* Action: Sell Item Button */}
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="h-4 w-px bg-zinc-800" />
             <Link
               to="/sell"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold rounded-md transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              <span>Sell Item</span>
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>Post Listing</span>
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Toggle */}
           <div className="flex lg:hidden items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-1.5 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-900"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -109,10 +115,10 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
 
         </div>
 
-        {/* Mobile Search */}
-        <div className="md:hidden pb-3">
+        {/* Mobile Search Bar */}
+        <div className="md:hidden pb-2.5 pt-1">
           <form onSubmit={handleSearchSubmit} className="relative w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search campus items..."
@@ -121,7 +127,7 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
                 setLocalSearch(e.target.value);
                 if (setSearchQuery) setSearchQuery(e.target.value);
               }}
-              className="w-full pl-9 pr-8 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:border-purple-600"
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-md text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono"
             />
           </form>
         </div>
@@ -129,44 +135,44 @@ export default function Navbar({ searchQuery, setSearchQuery, onSearchSubmit }) 
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
+        <div className="lg:hidden border-t border-zinc-800 bg-zinc-950 px-4 py-3 space-y-1 text-xs">
           <NavLink
             to="/"
             end
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
+            className="block px-3 py-2 font-medium text-zinc-300 hover:bg-zinc-900 rounded-md"
           >
             Main Window
           </NavLink>
           <NavLink
             to="/buy"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
+            className="block px-3 py-2 font-medium text-zinc-300 hover:bg-zinc-900 rounded-md"
           >
-            Buy
+            Buy Listings
           </NavLink>
           <NavLink
             to="/rent"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
+            className="block px-3 py-2 font-medium text-zinc-300 hover:bg-zinc-900 rounded-md"
           >
-            Rent
+            Rent Listings (2-Day Cycles)
           </NavLink>
           <NavLink
             to="/sell"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
+            className="block px-3 py-2 font-medium text-zinc-300 hover:bg-zinc-900 rounded-md"
           >
-            Sell
+            Sell Your Item (14-Day Duration)
           </NavLink>
           <div className="pt-2">
             <Link
               to="/sell"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-1.5 py-2 bg-purple-700 text-white text-xs font-semibold rounded-lg"
+              className="w-full flex items-center justify-center gap-1.5 py-2 bg-emerald-500 text-zinc-950 font-bold rounded-md text-xs"
             >
-              <Plus className="w-4 h-4" />
-              <span>Sell Item</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Post Listing</span>
             </Link>
           </div>
         </div>

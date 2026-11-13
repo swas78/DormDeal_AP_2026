@@ -54,7 +54,7 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="flex flex-col min-h-screen bg-slate-50 text-slate-800">
+      <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100">
         
         {/* Navigation Bar */}
         <Navbar />
@@ -62,11 +62,11 @@ export default function App() {
         {/* Global Toast Notification */}
         {toast && (
           <div className="fixed bottom-5 right-5 z-50">
-            <div className="flex items-center gap-2.5 px-3.5 py-2 bg-slate-900 text-white rounded-lg shadow-md max-w-sm text-xs">
+            <div className="flex items-center gap-2.5 px-3.5 py-2 bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-lg shadow-xl max-w-sm text-xs font-mono">
               {toast.type === 'buy' ? (
-                <ShoppingBag className="w-4 h-4 text-purple-400 shrink-0" />
+                <ShoppingBag className="w-4 h-4 text-emerald-400 shrink-0" />
               ) : toast.type === 'rent' ? (
-                <Repeat className="w-4 h-4 text-purple-400 shrink-0" />
+                <Repeat className="w-4 h-4 text-emerald-400 shrink-0" />
               ) : (
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               )}
@@ -74,7 +74,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setToast(null)}
-                className="text-slate-400 hover:text-white ml-2"
+                className="text-zinc-500 hover:text-white ml-2"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, CheckCircle2 } from 'lucide-react';
+import { Search, X, CheckCircle2, Clock, Repeat } from 'lucide-react';
 import { RENT_PRODUCTS, CATEGORIES } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import ItemDetailModal from '../components/ItemDetailModal';
@@ -35,87 +35,100 @@ export default function Rent({ rentalProducts = RENT_PRODUCTS, onRentItem }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Student Rentals
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Borrow bicycles, drafters, blazers, and appliances on 2-day listing cycles.
-          </p>
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400 text-[11px] font-mono mb-2">
+              <Clock className="w-3 h-3 text-emerald-400" />
+              <span>RENTAL POLICY: 2-DAY LISTING DURATION</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Campus Rental Hub
+            </h1>
+            <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              Borrow drafting boards, placement blazers, coolers, and bicycles from hostel peers
+            </p>
+          </div>
+          <span className="text-xs font-mono text-zinc-500">
+            {filteredRentals.length} rentals listed
+          </span>
         </div>
 
         {/* Confirmation Modal */}
         {rentConfirmedItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40">
-            <div className="bg-white max-w-sm w-full rounded-lg p-5 border border-slate-200 text-center">
-              <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-              <h3 className="text-base font-bold text-slate-900">Rental Requested</h3>
-              <p className="text-xs text-slate-500 mt-1">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+            <div className="bg-zinc-900 max-w-sm w-full rounded-lg p-5 border border-zinc-800 text-center">
+              <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+              <h3 className="text-base font-bold text-white">Rental Reserved</h3>
+              <p className="text-xs text-zinc-400 font-mono mt-1">
                 You booked <strong>{rentConfirmedItem.name}</strong> for ₹{rentConfirmedItem.rentalPrice}/{rentConfirmedItem.rentalPeriod}.
               </p>
 
-              <div className="my-3 p-3 bg-slate-50 rounded border border-slate-200 text-left text-xs space-y-1 text-slate-700">
+              <div className="my-3 p-3 bg-zinc-950 rounded border border-zinc-800 text-left text-xs font-mono space-y-1 text-zinc-300">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Owner:</span>
+                  <span className="text-zinc-500">Lender:</span>
                   <span>{rentConfirmedItem.owner?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Hostel:</span>
+                  <span className="text-zinc-500">Pickup:</span>
                   <span>{rentConfirmedItem.owner?.hostel}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Deposit:</span>
-                  <span>₹{rentConfirmedItem.securityDeposit}</span>
+                  <span className="text-zinc-500">Deposit:</span>
+                  <span className="text-emerald-400 font-bold">₹{rentConfirmedItem.securityDeposit} (Refundable)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Duration:</span>
+                  <span>2-Day Term</span>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setRentConfirmedItem(null)}
-                className="w-full py-1.5 bg-purple-700 hover:bg-purple-800 text-white font-medium text-xs rounded"
+                className="w-full py-1.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded transition-colors"
               >
-                Close
+                Done
               </button>
             </div>
           </div>
         )}
 
         {/* Search & Filters */}
-        <div className="bg-white p-3 rounded-lg border border-slate-200 mb-6 space-y-3">
+        <div className="bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 mb-6 space-y-2.5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative w-full sm:max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search rentals (cycles, drafters, blazers)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded focus:bg-white focus:outline-none focus:border-purple-600"
+                className="w-full pl-8 pr-7 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
-            <div className="w-full sm:w-auto flex items-center gap-1 overflow-x-auto">
-              <span className="text-xs text-slate-400 mr-1">Status:</span>
+            <div className="w-full sm:w-auto flex items-center gap-1 overflow-x-auto text-xs font-mono">
+              <span className="text-zinc-500 mr-1 shrink-0 text-[11px]">STATUS:</span>
               {['All', 'Available', 'Reserved', 'Currently Rented'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setSelectedAvailability(status)}
-                  className={`px-2.5 py-1 rounded text-xs transition-colors shrink-0 ${
+                  className={`px-2.5 py-1 rounded text-[11px] transition-colors shrink-0 ${
                     selectedAvailability === status
-                      ? 'bg-purple-700 text-white font-medium'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-emerald-500 text-zinc-950 font-bold'
+                      : 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:bg-zinc-800 hover:text-white'
                   }`}
                 >
                   {status}
@@ -125,14 +138,14 @@ export default function Rent({ rentalProducts = RENT_PRODUCTS, onRentItem }) {
           </div>
 
           {/* Category Filter */}
-          <div className="pt-2 border-t border-slate-100 flex items-center gap-1 overflow-x-auto text-xs">
-            <span className="text-slate-400 mr-1 shrink-0">Category:</span>
+          <div className="pt-2 border-t border-zinc-800 flex items-center gap-1 overflow-x-auto text-[11px] font-mono">
+            <span className="text-zinc-500 mr-1 shrink-0">CATEGORY:</span>
             <button
               onClick={() => setSelectedCategory('All')}
               className={`px-2 py-0.5 rounded shrink-0 ${
                 selectedCategory === 'All'
-                  ? 'bg-purple-50 text-purple-700 font-semibold'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-zinc-800 text-emerald-400 font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
               All
@@ -143,8 +156,8 @@ export default function Rent({ rentalProducts = RENT_PRODUCTS, onRentItem }) {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2 py-0.5 rounded shrink-0 ${
                   selectedCategory === cat
-                    ? 'bg-purple-50 text-purple-700 font-semibold'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-zinc-800 text-emerald-400 font-bold'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 {cat}
@@ -155,16 +168,16 @@ export default function Rent({ rentalProducts = RENT_PRODUCTS, onRentItem }) {
 
         {/* Results */}
         {filteredRentals.length === 0 ? (
-          <div className="bg-white rounded-lg border border-slate-200 p-8 text-center max-w-sm mx-auto my-6">
-            <h3 className="text-sm font-semibold text-slate-800">No rentals found</h3>
-            <p className="text-xs text-slate-400 mt-1">Try another search or status.</p>
+          <div className="bg-zinc-900 rounded-lg border border-zinc-800 p-8 text-center max-w-sm mx-auto my-6">
+            <h3 className="text-sm font-semibold text-zinc-200">No rental items found</h3>
+            <p className="text-xs text-zinc-500 font-mono mt-1">Try switching availability status or category.</p>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('All');
                 setSelectedAvailability('All');
               }}
-              className="mt-3 px-3 py-1.5 bg-purple-700 text-white text-xs font-medium rounded"
+              className="mt-3 px-3 py-1.5 bg-emerald-500 text-zinc-950 text-xs font-bold rounded"
             >
               Reset filters
             </button>
