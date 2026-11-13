@@ -333,3 +333,4 @@ export default function MainWindow({ buyProducts, onBuyItem, onRentItem }) {
     </div>
   );
 }
+

@@ -317,3 +317,4 @@ export default function Buy({ buyProducts = BUY_PRODUCTS, onBuyItem }) {
     </div>
   );
 }
+

@@ -507,3 +507,4 @@ export const RENT_PRODUCTS = [
     }
   }
 ];
+

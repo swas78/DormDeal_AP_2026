@@ -626,3 +626,4 @@ export default function Sell({ onAddNewProduct }) {
     </div>
   );
 }
+

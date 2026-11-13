@@ -271,3 +271,4 @@ export default function Rent({ rentalProducts = RENT_PRODUCTS, onRentItem }) {
     </div>
   );
 }
+
