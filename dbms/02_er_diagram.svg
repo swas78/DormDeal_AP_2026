@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100" style="background:#09090b; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#121215"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="circle" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="3" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <!-- Title & Metadata -->
+  <text x="60" y="55" fill="#f4f4f5" font-size="26" font-weight="bold" letter-spacing="1">DORMDEAL — ENTITY RELATIONSHIP DIAGRAM (3NF / BCNF)</text>
+  <text x="60" y="85" fill="#a1a1aa" font-size="14">Project: DormDeal Student Marketplace &amp; Rental Hub | Team: T0140 | Student: Kunal Agrawal (2501010238)</text>
+  <line x1="60" y1="105" x2="1540" y2="105" stroke="#27272a" stroke-width="1.5"/>
+
+  <!-- ================= RELATIONAL CONNECTORS ================= -->
+  <!-- Users -> Items (1:N) -->
+  <path d="M 370 290 L 530 290" fill="none" stroke="#10b981" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="430" y="280" fill="#34d399" font-size="11">1 : N (sells)</text>
+
+  <!-- Categories -> Items (1:N) -->
+  <path d="M 720 180 L 720 220" fill="none" stroke="#10b981" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="730" y="205" fill="#34d399" font-size="11">1 : N (classifies)</text>
+
+  <!-- Items -> Item Images (1:N) -->
+  <path d="M 910 330 L 1060 330" fill="none" stroke="#10b981" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="960" y="320" fill="#34d399" font-size="11">1 : N (min 3)</text>
+
+  <!-- Items -> Deals (1:N) -->
+  <path d="M 720 740 L 720 800" fill="none" stroke="#10b981" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="730" y="775" fill="#34d399" font-size="11">1 : N (contracts)</text>
+
+  <!-- Users -> Deals (Buyer) -->
+  <path d="M 230 570 L 230 890 L 530 890" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="250" y="880" fill="#38bdf8" font-size="11">1 : N (as Buyer)</text>
+
+  <!-- Deals -> Messages (1:N) -->
+  <path d="M 910 880 L 1060 880" fill="none" stroke="#10b981" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="960" y="870" fill="#34d399" font-size="11">1 : N (chats)</text>
+
+  <!-- Deals -> Reviews (1:1) -->
+  <path d="M 720 1020 L 720 1050 L 1240 1050 L 1240 760" fill="none" stroke="#f59e0b" stroke-width="2" marker-start="url(#circle)" marker-end="url(#arrow)"/>
+  <text x="930" y="1040" fill="#f59e0b" font-size="11">1 : 1 (rated deal)</text>
+
+  <!-- ================= ENTITY 1: USERS ================= -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="140" width="310" height="430" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="60" y="140" width="310" height="38" rx="8" fill="url(#headerGrad)"/>
+    <text x="75" y="165" fill="#09090b" font-size="15" font-weight="bold">USERS (Students)</text>
+    <text x="310" y="165" fill="#09090b" font-size="11" font-weight="bold">1NF..3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="78" y="200" fill="#34d399" font-weight="bold">PK  user_id</text><text x="260" y="200" fill="#71717a">SERIAL</text>
+      <text x="78" y="228">    full_name</text><text x="260" y="228" fill="#71717a">VARCHAR(100)</text>
+      <text x="78" y="256" fill="#38bdf8">UQ  email</text><text x="260" y="256" fill="#71717a">VARCHAR(255)</text>
+      <text x="78" y="284" fill="#38bdf8">UQ  phone</text><text x="260" y="284" fill="#71717a">VARCHAR(20)</text>
+      <text x="78" y="312">    hostel_name</text><text x="260" y="312" fill="#71717a">VARCHAR(100)</text>
+      <text x="78" y="340">    room_number</text><text x="260" y="340" fill="#71717a">VARCHAR(30)</text>
+      <text x="78" y="368">    academic_year</text><text x="260" y="368" fill="#71717a">VARCHAR(50)</text>
+      <text x="78" y="396">    avg_rating</text><text x="260" y="396" fill="#71717a">NUMERIC(3,2)</text>
+      <text x="78" y="424">    rating_count</text><text x="260" y="424" fill="#71717a">INT</text>
+      <text x="78" y="452">    is_active</text><text x="260" y="452" fill="#71717a">BOOLEAN</text>
+      <text x="78" y="480">    created_at</text><text x="260" y="480" fill="#71717a">TIMESTAMPTZ</text>
+    </g>
+    <rect x="75" y="515" width="280" height="36" rx="4" fill="#27272a" opacity="0.6"/>
+    <text x="85" y="538" fill="#a1a1aa" font-size="10">Candidate Keys: {user_id}, {email}, {phone}</text>
+  </g>
+
+  <!-- ================= ENTITY 2: CATEGORIES ================= -->
+  <g filter="url(#shadow)">
+    <rect x="530" y="50" width="380" height="130" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="530" y="50" width="380" height="34" rx="8" fill="url(#headerGrad)"/>
+    <text x="545" y="73" fill="#09090b" font-size="14" font-weight="bold">CATEGORIES (Lookup Taxonomy)</text>
+    <text x="850" y="73" fill="#09090b" font-size="11" font-weight="bold">3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="548" y="105" fill="#34d399" font-weight="bold">PK  category_id</text><text x="780" y="105" fill="#71717a">SERIAL</text>
+      <text x="548" y="130" fill="#38bdf8">UQ  category_name</text><text x="780" y="130" fill="#71717a">VARCHAR(50)</text>
+      <text x="548" y="155">    slug, description</text><text x="780" y="155" fill="#71717a">TEXT</text>
+    </g>
+  </g>
+
+  <!-- ================= ENTITY 3: ITEMS ================= -->
+  <g filter="url(#shadow)">
+    <rect x="530" y="220" width="380" height="520" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="530" y="220" width="380" height="38" rx="8" fill="url(#headerGrad)"/>
+    <text x="545" y="245" fill="#09090b" font-size="15" font-weight="bold">ITEMS (Listings: Buy &amp; Rent)</text>
+    <text x="850" y="245" fill="#09090b" font-size="11" font-weight="bold">3NF / BCNF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="548" y="280" fill="#34d399" font-weight="bold">PK  item_id</text><text x="780" y="280" fill="#71717a">SERIAL</text>
+      <text x="548" y="306" fill="#f59e0b">FK  seller_id -&gt; users</text><text x="780" y="306" fill="#71717a">INT (NOT NULL)</text>
+      <text x="548" y="332" fill="#f59e0b">FK  category_id -&gt; categories</text><text x="780" y="332" fill="#71717a">INT (NOT NULL)</text>
+      <text x="548" y="358">    title</text><text x="780" y="358" fill="#71717a">VARCHAR(255)</text>
+      <text x="548" y="384">    description</text><text x="780" y="384" fill="#71717a">TEXT</text>
+      <text x="548" y="410">    listing_type (BUY / RENT)</text><text x="780" y="410" fill="#71717a">VARCHAR(10)</text>
+      <text x="548" y="436">    item_condition</text><text x="780" y="436" fill="#71717a">VARCHAR(20)</text>
+      <text x="548" y="462">    price</text><text x="780" y="462" fill="#71717a">NUMERIC(10,2)</text>
+      <text x="548" y="488">    original_price</text><text x="780" y="488" fill="#71717a">NUMERIC(10,2)</text>
+      <text x="548" y="514">    rental_period (day, week)</text><text x="780" y="514" fill="#71717a">VARCHAR(20)</text>
+      <text x="548" y="540">    security_deposit</text><text x="780" y="540" fill="#71717a">NUMERIC(10,2)</text>
+      <text x="548" y="566">    listing_duration_days (14/2)</text><text x="780" y="566" fill="#71717a">INT</text>
+      <text x="548" y="592">    open_to_bargaining</text><text x="780" y="592" fill="#71717a">BOOLEAN</text>
+      <text x="548" y="618">    has_defects, defect_details</text><text x="780" y="618" fill="#71717a">BOOL, TEXT</text>
+      <text x="548" y="644">    pickup_location</text><text x="780" y="644" fill="#71717a">VARCHAR(255)</text>
+      <text x="548" y="670">    status (AVAILABLE/RENTED/SOLD)</text><text x="780" y="670" fill="#71717a">VARCHAR(20)</text>
+      <text x="548" y="696">    created_at, updated_at</text><text x="780" y="696" fill="#71717a">TIMESTAMPTZ</text>
+    </g>
+  </g>
+
+  <!-- ================= ENTITY 4: ITEM_IMAGES ================= -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="240" width="360" height="200" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="1060" y="240" width="360" height="34" rx="8" fill="url(#headerGrad)"/>
+    <text x="1075" y="263" fill="#09090b" font-size="14" font-weight="bold">ITEM_IMAGES (Gallery)</text>
+    <text x="1360" y="263" fill="#09090b" font-size="11" font-weight="bold">3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="1078" y="295" fill="#34d399" font-weight="bold">PK  image_id</text><text x="1310" y="295" fill="#71717a">SERIAL</text>
+      <text x="1078" y="322" fill="#f59e0b">FK  item_id -&gt; items</text><text x="1310" y="322" fill="#71717a">INT (CASCADE)</text>
+      <text x="1078" y="349">    image_url</text><text x="1310" y="349" fill="#71717a">TEXT</text>
+      <text x="1078" y="376">    display_order</text><text x="1310" y="376" fill="#71717a">INT (1..N)</text>
+      <text x="1078" y="403">    is_primary</text><text x="1310" y="403" fill="#71717a">BOOLEAN</text>
+    </g>
+    <text x="1078" y="425" fill="#a1a1aa" font-size="10">Resolves multi-valued photo array from UNF</text>
+  </g>
+
+  <!-- ================= ENTITY 5: DEALS ================= -->
+  <g filter="url(#shadow)">
+    <rect x="530" y="800" width="380" height="260" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="530" y="800" width="380" height="36" rx="8" fill="url(#headerGrad)"/>
+    <text x="545" y="824" fill="#09090b" font-size="15" font-weight="bold">DEALS (Transactions &amp; Rentals)</text>
+    <text x="850" y="824" fill="#09090b" font-size="11" font-weight="bold">3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="548" y="860" fill="#34d399" font-weight="bold">PK  deal_id</text><text x="780" y="860" fill="#71717a">SERIAL</text>
+      <text x="548" y="884" fill="#f59e0b">FK  item_id -&gt; items</text><text x="780" y="884" fill="#71717a">INT</text>
+      <text x="548" y="908" fill="#f59e0b">FK  buyer_id -&gt; users</text><text x="780" y="908" fill="#71717a">INT</text>
+      <text x="548" y="932" fill="#f59e0b">FK  seller_id -&gt; users</text><text x="780" y="932" fill="#71717a">INT</text>
+      <text x="548" y="956">    deal_type, agreed_price</text><text x="780" y="956" fill="#71717a">VARCHAR, NUM</text>
+      <text x="548" y="980">    security_deposit_paid</text><text x="780" y="980" fill="#71717a">NUMERIC(10,2)</text>
+      <text x="548" y="1004">    rental_start, rental_end</text><text x="780" y="1004" fill="#71717a">DATE</text>
+      <text x="548" y="1028">    deal_status, created_at</text><text x="780" y="1028" fill="#71717a">VARCHAR, TIME</text>
+    </g>
+  </g>
+
+  <!-- ================= ENTITY 6: MESSAGES ================= -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="780" width="360" height="190" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="1060" y="780" width="360" height="34" rx="8" fill="url(#headerGrad)"/>
+    <text x="1075" y="803" fill="#09090b" font-size="14" font-weight="bold">MESSAGES (Negotiations &amp; Chats)</text>
+    <text x="1360" y="803" fill="#09090b" font-size="11" font-weight="bold">3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="1078" y="835" fill="#34d399" font-weight="bold">PK  message_id</text><text x="1310" y="835" fill="#71717a">SERIAL</text>
+      <text x="1078" y="860" fill="#f59e0b">FK  deal_id -&gt; deals</text><text x="1310" y="860" fill="#71717a">INT</text>
+      <text x="1078" y="885" fill="#f59e0b">FK  sender_id -&gt; users</text><text x="1310" y="885" fill="#71717a">INT</text>
+      <text x="1078" y="910" fill="#f59e0b">FK  receiver_id -&gt; users</text><text x="1310" y="910" fill="#71717a">INT</text>
+      <text x="1078" y="935">    content</text><text x="1310" y="935" fill="#71717a">TEXT</text>
+      <text x="1078" y="960">    sent_at</text><text x="1310" y="960" fill="#71717a">TIMESTAMPTZ</text>
+    </g>
+  </g>
+
+  <!-- ================= ENTITY 7: REVIEWS ================= -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="510" width="360" height="220" rx="8" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+    <rect x="1060" y="510" width="360" height="34" rx="8" fill="url(#headerGrad)"/>
+    <text x="1075" y="533" fill="#09090b" font-size="14" font-weight="bold">REVIEWS (Peer Trust Ratings)</text>
+    <text x="1360" y="533" fill="#09090b" font-size="11" font-weight="bold">3NF</text>
+    
+    <g font-size="12" fill="#e4e4e7">
+      <text x="1078" y="565" fill="#34d399" font-weight="bold">PK  review_id</text><text x="1310" y="565" fill="#71717a">SERIAL</text>
+      <text x="1078" y="590" fill="#f59e0b">FK  deal_id (UQ) -&gt; deals</text><text x="1310" y="590" fill="#71717a">INT</text>
+      <text x="1078" y="615" fill="#f59e0b">FK  reviewer_id -&gt; users</text><text x="1310" y="615" fill="#71717a">INT</text>
+      <text x="1078" y="640" fill="#f59e0b">FK  reviewee_id -&gt; users</text><text x="1310" y="640" fill="#71717a">INT</text>
+      <text x="1078" y="665">    rating (1..5)</text><text x="1310" y="665" fill="#71717a">INT</text>
+      <text x="1078" y="690">    comment, created_at</text><text x="1310" y="690" fill="#71717a">TEXT, TIME</text>
+    </g>
+  </g>
+
+</svg>
