@@ -1,0 +1,17 @@
+{
+  "name": "campuskart",
+  "version": "1.0.0",
+  "description": "CampusKart - University Student Marketplace (OLX for University Students)",
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start": "cd backend && npm start",
+    "seed": "cd backend && npm run seed",
+    "test": "cd backend && npm test",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
