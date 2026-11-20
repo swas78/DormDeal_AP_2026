@@ -1,155 +1,306 @@
+<div align="center">
+
 # DormDeal | Your Dorm. Your Deals.
-### University-Exclusive Peer-to-Peer Student Marketplace and Rental Hub
+### **University-Exclusive Peer-to-Peer Student Marketplace & Rental Hub**
 
-Advanced Programming (AP) and Database Management Systems (DBMS) Project
-Rishihood University, Sonipat
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_8-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-3NF_Schema-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Status](https://img.shields.io/badge/Tests-18%2F18_Passing-success?style=for-the-badge&logo=checkmarx&logoColor=white)]()
+
+<br />
+
+**A campus-contained circular economy platform connecting verified university students across hostel blocks for direct buying, selling, short-term renting, and reverse broadcast requests with 1-click WhatsApp physical handovers.**
+
+[Explore Live Demo](#quick-start) • [System Architecture](#system-architecture) • [Team Contributions](#team-work-division) • [DBMS Documentation](#database--dbms-architecture) • [API Reference](#api-endpoints-reference)
 
 ---
 
-## About The Project
+</div>
 
-DormDeal basically college hostel ke liye banaya gaya peer-to-peer student marketplace aur rental hub hai. College campus ke andar students ko aksar sem exams ke liye drafter, calculator, lab manual ya placement drives ke liye blazers chahiye hote hain. Har baar nayi cheez khareedna mehenga padta hai, aur bahar ke platforms (jaise OLX vagera) par fraud ka risk rehta hai plus delivery campus ke andar nahi aati. 
-
-DormDeal is problem ko solve karta hai. Sirf verified university enrollment ID wale students hi login kar sakte hain. Saari trading hostel-to-hostel hoti hai with 1-click WhatsApp connection, and physical handover ke time hi direct cash ya UPI se payment hoti hai. Platform ka koi commission ya hidden cut nahi hai.
+## Table of Contents
+1. [Platform Highlights](#platform-highlights)
+2. [Dual Marketplace Engine (BUY & RENT)](#dual-marketplace-engine)
+3. [Reverse Marketplace (ISO Broadcast Board)](#reverse-marketplace-iso-board)
+4. [Handover Contract State Machine](#handover-contract-lifecycle)
+5. [Campus Taxonomy (11 Categories)](#11-core-campus-categories)
+6. [Team Responsibility Division](#team-work-division)
+7. [Database & DBMS Architecture](#database--dbms-architecture)
+8. [Technology Stack](#technology-stack)
+9. [API Endpoints Reference](#api-endpoints-reference)
+10. [Quick Start & Setup](#quick-start)
+11. [Real OTP Configuration (Email & SMS)](#real-otp-configuration)
+12. [Verification & Test Suite](#automated-test-suite)
 
 ---
 
-## Team Members and Work Division
+## Platform Highlights
 
-College evaluation aur viva ke hisab se poora project team ke beech clearly divide kiya gaya hai:
+DormDeal basically college hostel ke liye banaya gaya peer-to-peer student marketplace aur rental hub hai, eliminating fraudulent external listings, shipping delays, aur third-party middleman commission fees:
 
-| Team Member | Username | Primary Domain | Work Done |
+- **100% University Verified**: Requires active university enrollment IDs, student emails, hostel block, and room numbers.
+- **Direct Offline Handover (No Platform Fees)**: Transactions finalize in-person in the hostel via cash or UPI upon physical inspection.
+- **1-Click WhatsApp Quick-Chat**: Pre-formats `https://wa.me/<phone>?text=<encoded_text>` quoting the exact item, price, and hostel meetup request with zero contact saving friction.
+- **"In Your Hostel!" Proximity Badges**: Dynamically identifies whether a seller lives on your floor or block.
+- **Auto-Expiry Engines**: 14-day auto-TTL for marketplace listings and 3-day (72-hour) auto-TTL for urgent student broadcast requests.
+- **1-Click Relisting / Renew**: One-click listing extension (`+14 days`) so items stay fresh without stale clutter.
+- **Mandatory Defect Disclosure**: Enforces explicit condition explanations (`defectDetails`) if an item has scratches, tears, or defects.
+- **Security Deposit Escrow Tracking**: Calculates and protects refundable deposits for short-term tool, camera, and blazer rentals.
+- **Verified Deal Reviews**: Strictly 1 review per completed handover, dynamically updating seller trust ratings (1.00 to 5.00).
+
+---
+
+## Dual Marketplace Engine
+
+Students can toggle between direct sales and short-term rentals within a unified interface:
+
+```
++-----------------------------------------------------------------------------------------+
+|                                    LISTING MODES                                        |
++-----------------------------------------------------------------------------------------+
+|  DIRECT SALE MODE (BUY)                     |  SHORT-TERM RENTAL HUB (RENT)             |
++---------------------------------------------+-------------------------------------------+
+|  • Permanent ownership transfer             |  • Period-based pricing: hour/day/wk/mo   |
+|  • Fixed Price or Bargaining Toggle         |  • Mandatory Refundable Security Deposit  |
+|  • MRP Discount Savings Display             |  • Escrow return status inspection        |
+|  • 3-Photo visual inspection gallery        |  • Automatic return-to-inventory state    |
+|  • 14-day auto-expiry lifespan              |  • Date-range active rental tracking      |
++-----------------------------------------------------------------------------------------+
+```
+
+---
+
+## Reverse Marketplace (ISO Board)
+
+Instead of searching endlessly, students who need an item urgently for an exam, project, or event can broadcast an **"In Search Of" (ISO)** request:
+
+1. **Broadcast Creation**: Student posts item needed (*e.g., "Casio 991CW Calculator for tomorrow's exam"*), category, budget (in INR), and urgency (*Urgent / Today / Flexible*).
+2. **72-Hour Live Countdown**: Every card displays hours remaining before auto-expiry.
+3. **1-Click "I Have This!" Fulfillment**: Any campus peer with the item clicks one button to fulfill the request.
+4. **Instant In-App Alert**: The requester immediately receives a high-priority notification with the fulfilling student's hostel block, room number, and phone number to coordinate pickup.
+
+---
+
+## Handover Contract Lifecycle
+
+DormDeal formalizes transactions through an enforceable state machine rather than unmanaged chats:
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: Buyer requests deal
+    PENDING --> ACCEPTED: Seller approves & sets hostel meetup
+    PENDING --> CANCELLED: Deal rejected
+    ACCEPTED --> ACTIVE: Physical inspection complete; cash/UPI paid
+    ACCEPTED --> CANCELLED: Handover aborted
+    ACTIVE --> RETURNED: (Rental) Item returned & deposit released
+    ACTIVE --> COMPLETED: (Direct Sale) Handover finalized
+    RETURNED --> COMPLETED: Handover finalized
+    COMPLETED --> [*]: Verified 1-to-5 Star Review Unlocked
+```
+
+---
+
+## 11 Core Campus Categories
+
+DormDeal's taxonomy is tailored specifically to university dormitory life:
+
+| Category | Example Student Items |
+| :--- | :--- |
+| **Clothing** | Placement suits & blazers, winter hoodies, ethnic fest formals, college jerseys |
+| **Electronics** | Scientific calculators (Casio 991EX), extension spikes, kettles, room coolers, DSLR cameras |
+| **Notes** | Handwritten spiral notebooks, semester question banks, exam cheat-sheets |
+| **Printouts** | Lab observation manuals, syllabus packets, architecture blueprints |
+| **Groceries** | Hostel midnight snacks, packaged dry foods, instant noodles, beverages |
+| **Stationery** | Engineering drafters, sheet containers, geometry compass sets, acrylic markers |
+| **Hostel Decor** | Study desk chairs, foldable bed tables, fairy lights, organizers, laundry hampers |
+| **Utensils** | Induction cookware, stainless steel plates, mugs, spoons, electric kettles |
+| **Skincare** | Daily grooming essentials, sunscreens, personal care bottles |
+| **Haircare** | Hair dryers, ceramic straighteners, hair clippers, styling brushes |
+| **Sports Items** | Badminton racquets, shuttlecocks, gym dumbbells, bicycles, yoga mats |
+
+---
+
+## Team Work Division
+
+The system workload was split according to technical domains and module complexity. For full details, see **[PROJECT_TEAM_DIVISION.md](file:///Users/swastikmishra1425/Desktop/DormDeal/DormDeal_AP_2026/PROJECT_TEAM_DIVISION.md)**.
+
+```
+                      DORMDEAL RESPONSIBILITY MATRIX
+  =======================================================================
+  
+  [ FRONTEND ARCHITECTURE ]
+  |-- Marketplace Catalog & Detail Modals -------- Kunal
+  |-- Dual Sell/Rent Listing Form ---------------- Kunal
+  |-- Category Filter & Search Bar --------------- Kunal
+  |
+  |-- Reverse Marketplace ISO Board -------------- Abhijeet
+  |-- Deals Handover Contract Manager ------------ Abhijeet
+  |-- Post-Handover 1-5 Star Reviews ------------- Abhijeet
+  `-- Live Notifications Polling Hook ------------ Abhijeet
+
+  [ BACKEND ARCHITECTURE (~80% Core) ]
+  |-- Auth, JWT, OTP & Security Middleware ------- Swastik (Lead)
+  |-- Handover Deals State Machine --------------- Swastik (Lead)
+  |-- Auto-Expiry Engine (14d/3d TTL) ------------ Swastik (Lead)
+  |-- Reverse Broadcast Matchmaking Engine ------- Swastik (Lead)
+  |-- Multer Multi-Photo Pipeline ---------------- Swastik (Lead)
+  |
+  |-- Items Catalog Read & Search APIs ----------- Kunal (Simple API)
+  |-- Reviews & Notifications APIs --------------- Abhijeet (Simple API)
+  `-- Health Ping & DB Connection Handler -------- Tanishkka (Simple API)
+
+  [ DATABASE & DBMS ARCHITECTURE ]
+  |-- 3NF/BCNF Relational SQL Schema ------------- Tanishkka
+  |-- ER Diagram & Normalization Proofs ---------- Tanishkka
+  |-- Workload & Analytical SQL Queries ---------- Tanishkka
+  |-- Mongoose Schemas & DB Seeder --------------- Tanishkka
+  `-- DBMS Architecture Documentation ----------- Tanishkka
+  =======================================================================
+```
+
+---
+
+## Database & DBMS Architecture
+
+DormDeal implements a dual data architecture: **PostgreSQL Relational 3NF Schema** for formal DBMS documentation and **MongoDB/Mongoose Document Collections** for flexible application persistence.
+
+### Entity Relationship Diagram
+```
++-----------------------------------------------------------------------------------------------------------------+
+|                                           ENTITY RELATIONSHIP OVERVIEW                                          |
++-----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                 |
+|   +-----------------------+              +-----------------------+              +---------------------------+   |
+|   |         USERS         |              |      CATEGORIES       |              |    BROADCAST_REQUESTS     |   |
+|   +-----------------------+              +-----------------------+              +---------------------------+   |
+|   | PK  user_id           |              | PK  category_id       |              | PK  broadcast_id          |   |
+|   |     enrollment_id (UQ)|              |     category_name (UQ)| <------+     | FK  buyer_id      (USERS) |   |
+|   |     email         (UQ)|              |     slug          (UQ)|        |     | FK  category_id (CATEGOR) |   |
+|   |     hostel_name       |              +-----------+-----------+        |     |     title, budget, notes  |   |
+|   |     room_number       |                          |                    |     |     status, expires_at    |   |
+|   |     avg_rating        |                          | 1:N                |     +---------------------------+   |
+|   +-----------+-----------+                          |                    |     +---------------------------+   |
+|               |                                      |                    |                                     |
+|               +-----------------------+              |                    |                                     |
+|               | 1:N (as seller)       | 1:N          v                    |                                     |
+|               v                       v     +--------+------------+       |                                     |
+|   +-----------+-----------+   +-------+---+ |        ITEMS        |       |                                     |
+|   |     NOTIFICATIONS     |   |  REVIEWS  | +---------------------+       |                                     |
+|   +-----------------------+   +-----------+ | PK  item_id         |       |                                     |
+|   | PK  notification_id   |   | review_id | | FK  seller_id       |-------+                                     |
+|   | FK  recipient_id      |   | FK deal_id| | FK  category_id     |                                             |
+|   |     title, message    |   | rating    | |     listing_type    | ('SELL' | 'RENT')                           |
+|   +-----------------------+   +-----+-----+ |     price, deposit  |                                             |
+|                                     |       |     has_defects     |                                             |
+|                                     | 1:1   |     expires_at (14d)|                                             |
+|                                     v       +----------+----------+                                             |
+|                               +-----+-------+          |                                                        |
+|                               |    DEALS    |          | 1:N                                                    |
+|                               +-------------+          v                                                        |
+|                               | PK deal_id  |   +------+------+                                                 |
+|                               | FK item_id  |   | ITEM_IMAGES |                                                 |
+|                               | FK buyer_id |   +-------------+                                                 |
+|                               | FK seller_id|   | PK image_id |                                                 |
+|                               +-------------+   +-------------+                                                 |
++-----------------------------------------------------------------------------------------------------------------+
+```
+
+### DBMS Artifacts in `/dbms`:
+- **`dbms/01_normalization.md`**: Academic proofs eliminating insertion, update, and deletion anomalies through 1NF, 2NF, 3NF, and BCNF.
+- **`dbms/02_er_diagram.svg`**: High-resolution vector Entity-Relationship diagram.
+- **`dbms/03_schema.sql`**: Production PostgreSQL DDL with check constraints and foreign keys.
+- **`dbms/04_queries.sql`**: Workload queries covering seller ratings, active rental deposit audits, and auto-expiry cron cleanups.
+- **`dbms/DATABASE_DOCUMENTATION.md`**: Complete report on transaction isolation, indexing, and normalization.
+
+---
+
+## Technology Stack
+
+### Backend
+- **Runtime**: Node.js (v18+) with Express.js REST API.
+- **Data Modeling**: Mongoose 8.x + MongoDB.
+- **In-Memory Fallback**: `mongodb-memory-server` (spins up automatically if local MongoDB is offline).
+- **Authentication**: Stateless JWT (`jsonwebtoken`) + Salted bcrypt hashing (`bcryptjs`).
+- **File Storage**: Multer multi-part handler with 5MB validation.
+- **Security**: Helmet security headers, CORS origin isolation, input sanitization.
+- **Notifications & Mail**: Nodemailer SMTP (Gmail, Outlook, custom) + Fast2SMS / Twilio.
+
+### Frontend
+- **Framework**: React 18 with Vite 6.
+- **Styling**: Tailwind CSS with custom Neo-Brutalist design tokens (`#1c1c1d`, `#FFFDF8`, `#FFF9EE`).
+- **Icons**: Lucide React.
+- **Routing**: React Router DOM (v6) with declarative `ProtectedRoute` guards.
+- **HTTP Client**: Axios with automatic JWT Bearer token injection.
+
+---
+
+## API Endpoints Reference
+
+### Authentication & Student Identity
+| Method | Route | Access | Description |
 | :--- | :--- | :--- | :--- |
-| **Swastik Mishra (Lead)** | `swas78` | Core Backend & Architecture | Auth & JWT, 6-digit OTP delivery (real email/SMS), Contract State Machine, 14-day auto-expiry TTL, Reverse Broadcast matching logic, Multer multi-image pipeline, test suite. |
-| **Kunal Agrawal** | `kunal-13106` | Frontend (Catalog) & Backend Items API | Marketplace catalog, ProductCard with BUY/RENT toggles, ProductDetailModal with WhatsApp chat, SellModal, 11-category filter, and items query API (`getItems`, `getItemById`). |
-| **Abhijeet Saini** | `abhijeet-s24` | Frontend (Deals/Broadcast) & Backend Alerts | Reverse Marketplace ISO board (72-hour timer), DealsFeed contract manager, ReviewModal, 30s notification polling hook, review controller, and notification routes. |
-| **Tanishkka** | `Tanishkka27` | Database (DBMS) & Connection | 3NF/BCNF relational SQL schema (`03_schema.sql`), ER diagram, normalization proofs, SQL analytical queries, Mongoose models, seeder script, and database connection lifecycle. |
+| `POST` | `/api/auth/send-otp` | Public | Dispatches 6-digit verification OTP (Email / SMS) |
+| `POST` | `/api/auth/verify-otp` | Public | Validates 6-digit OTP code |
+| `POST` | `/api/auth/register` | Public | Registers student with hostel block & room |
+| `POST` | `/api/auth/login` | Public | Authenticates via email/phone and issues JWT |
+| `POST` | `/api/auth/reset-password` | Public | Resets password using verified OTP |
+| `PUT` | `/api/users/accept-disclaimer` | Private | Accepts campus trading guidelines |
+| `GET` | `/api/users/me` | Private | Retrieves current authenticated student profile |
 
-Detailed breakdown aur file-level ownership ke liye check karein: `PROJECT_TEAM_DIVISION.md`.
+### Marketplace Catalog (BUY & RENT)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/items` | Public | Lists active items with category, search, and type filters |
+| `GET` | `/api/items/:id` | Public | Fetches item details with seller hostel info |
+| `POST` | `/api/items` | Private | Creates new listing with multi-image upload |
+| `PUT` | `/api/items/:id/status` | Private | Updates status (`AVAILABLE`, `RENTED`, `SOLD`) |
+| `PUT` | `/api/items/:id/renew` | Private | Extends listing lifespan by +14 days |
+| `DELETE` | `/api/items/:id` | Private | Deletes listing (owner only) |
 
----
+### Reverse Marketplace (ISO Broadcasts)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/broadcasts` | Public | Lists active broadcasts (3-day countdown) |
+| `POST` | `/api/broadcasts` | Private | Creates an urgent item request |
+| `POST` | `/api/broadcasts/:id/match` | Private | "I Have This!" fulfill action; alerts buyer |
 
-## Core Features (Features Kaise Kaam Karte Hain)
+### Deals & Contract Handover
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/deals` | Private | Initiates purchase or rental deal contract |
+| `GET` | `/api/deals/my-deals` | Private | Fetches active and completed student deals |
+| `PUT` | `/api/deals/:id/status` | Private | Advances state machine (`ACCEPTED`, `ACTIVE`, `RETURNED`, `COMPLETED`, `CANCELLED`) |
 
-### 1. Direct Sale (BUY) vs Short-Term Rental (RENT)
-- **Direct Sale (BUY)**: Kisi ko apni purani textbooks, study table ya room cooler permanently bechna ho. MRP vs Selling price se student ki savings dikhti hai, plus fixed price ya bargaining open ka toggle rehta hai.
-- **Short-Term Rental (RENT)**: Calculator, DSLR, placement blazer ya induction kettle har student ko permanently nahi chahiye hoti. Isliye hourly, daily, weekly ya monthly rent par lene ka option hai with mandatory refundable security deposit jo item safely wapas aane par unlock ho jata hai.
-
-### 2. Reverse Marketplace (ISO - "In Search Of" Broadcast Board)
-- Agar koi item marketplace me listed nahi hai, toh student ek broadcast request daal sakta hai (jaise: *"B.Tech Sem 3 Maths 3 Handwritten Notes chahiye kal tak"*).
-- Har broadcast request 3 din (72 ghante) me auto-expire ho jaati hai taaki outdated requests board par jama na hon.
-- Koi bhi fellow student jiske paas wo cheez hai wo **"I Have This"** button daba sakta hai. Requester ko turant notification jaata hai with fulfilling student ka hostel block, room number aur contact number.
-
-### 3. Handover Contract State Machine
-Hostel transactions me confusion na ho isliye deals ka ek strict flow banaya gaya hai:
-- `PENDING`: Buyer ne buy ya rent request daali.
-- `ACCEPTED`: Seller ne accept kiya aur common room ya room par milne ka time decide hua. Item automatic `RESERVED` ho jaata hai.
-- `ACTIVE`: Dono students hostel me mile, item check kiya, aur physical cash/UPI handover ho gaya.
-- `RETURNED`: (Rentals ke liye) Item seller ko wapas lautaya gaya, inspection hui, aur security deposit wapas ho gaya.
-- `COMPLETED`: Deal finalize ho gayi, aur seller ke liye 1 se 5 star verified rating unlock ho gayi.
-- `CANCELLED`: Kisi bhi reason se agar meetup nahi ho paya toh item wapas `AVAILABLE` ho jata hai.
-
-### 4. 1-Click WhatsApp Direct Connect
-Bina kisi ka number phone me save kiye bina, buyer directly **"Chat on WhatsApp"** button dabata hai. Ye seedha `https://wa.me/<phone>?text=...` open karta hai jisme item ka naam, price aur meetup request pehle se likhi aati hai.
-
-### 5. "In Your Hostel!" Proximity Badge
-Agar item kisi aise student ne daala hai jo aapke hi hostel block me rehta hai, toh uspar green proximity badge show hota hai taaki student ko pata rahe ki use campus ke doosre kone me chalkar nahi jaana padega.
-
-### 6. Mandatory Defect Disclosure
-Agar item me koi kharabi ya scratch hai, toh `hasDefects` flag ko true karna padta hai aur explanation likhna compulsory hai. Aisa na karne par listing reject ho jaati hai.
-
----
-
-## 11 Campus Categories
-
-Hostel life aur university syllabus ke hisab se 11 categories rakhi gayi hain:
-1. **Clothing**: Placement blazers, winter wear, college hoodies, ethnic formals
-2. **Electronics**: Scientific calculators, kettles, extension cords, room coolers
-3. **Notes**: Handwritten spiral notebooks, question banks, cheat-sheets
-4. **Printouts**: Lab manuals, syllabus packets, blueprints
-5. **Groceries**: Hostel midnight snacks, packaged food, beverages
-6. **Stationery**: Engineering drafters, sheet holders, compass sets, markers
-7. **Hostel Decor**: Study chairs, bed tables, fairy lights, organizers
-8. **Utensils**: Induction pans, plates, spoons, mugs, kettles
-9. **Skincare**: Daily grooming essentials, sunscreen
-10. **Haircare**: Hair dryers, straighteners, styling brushes
-11. **Sports Items**: Badminton racquets, dumbbells, gym gear, bicycles
+### Reviews & Notifications
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/reviews` | Private | Submits 1-5 star review for completed deal |
+| `GET` | `/api/reviews/seller/:sellerId` | Public | Retrieves verified reviews for a student |
+| `GET` | `/api/notifications` | Private | Retrieves in-app alerts (30s polling) |
+| `PUT` | `/api/notifications/:id/read` | Private | Marks alert as read |
 
 ---
 
-## Database Architecture and DBMS Work
+## Quick Start
 
-Database work Tanishkka ne handle kiya hai. Project me relational DBMS aur document database dono ka complete setup hai:
-
-- **Relational 3NF/BCNF Schema (`dbms/03_schema.sql`)**: PostgreSQL DDL jisme foreign keys, ON DELETE CASCADE, CHECK constraints, aur indexing properly configured hai.
-- **Normalization Proofs (`dbms/01_normalization.md`)**: Complete proof showing unnormalized 0NF data moving to 1NF, 2NF, 3NF aur BCNF anomalies removal.
-- **ER Diagram (`dbms/02_er_diagram.svg` and `.png`)**: Visual diagram showing relationships between Users, Items, Categories, Deals, Broadcasts, Reviews, aur Notifications.
-- **Analytical SQL Queries (`dbms/04_queries.sql`)**: Top sellers query, active security deposits audit, aur auto-expiry cron queries.
-- **In-Memory MongoDB Support**: Evaluator ke laptop par local MongoDB installed na ho toh bhi project bina kisi configuration ke turant start ho jata hai via `mongodb-memory-server` and auto-seed ho jata hai.
-
----
-
-## Tech Stack Used
-
-- **Backend**: Node.js, Express.js (strictly CommonJS `require`), Mongoose, JWT (`jsonwebtoken`), `bcryptjs`, Multer, Helmet, CORS, Nodemailer.
-- **Frontend**: React 18, Vite 6, Tailwind CSS, Lucide React, Axios, React Router DOM v6.
-- **Database**: MongoDB (Production & In-Memory fallback), PostgreSQL (DBMS 3NF DDL specifications).
-
----
-
-## API Routes Summary
-
-### Auth and User
-- `POST /api/auth/send-otp`: 6-digit OTP generate karta hai (email aur SMS ke liye).
-- `POST /api/auth/verify-otp`: Entered OTP code verify karta hai.
-- `POST /api/auth/register`: Student registration with hostel block aur room number.
-- `POST /api/auth/login`: Email ya phone number se student login.
-- `POST /api/auth/reset-password`: OTP verification ke baad password reset.
-- `PUT /api/users/accept-disclaimer`: Campus trading guidelines accept karna.
-- `GET /api/users/me`: Current logged-in student profile.
-
-### Marketplace Items
-- `GET /api/items`: Items list with search, category aur type filter.
-- `GET /api/items/:id`: Item details with seller hostel details.
-- `POST /api/items`: New listing create karna (with 3-photo upload).
-- `PUT /api/items/:id/status`: Item status update (`AVAILABLE`, `RENTED`, `SOLD`).
-- `PUT /api/items/:id/renew`: Listing ko +14 days extend karna.
-- `DELETE /api/items/:id`: Listing delete karna (only owner).
-
-### Reverse Broadcasts (ISO)
-- `GET /api/broadcasts`: Active 3-day requests list.
-- `POST /api/broadcasts`: Naya urgent item request post karna.
-- `POST /api/broadcasts/:id/match`: "I Have This" fulfill click, buyer ko notification bhejna.
-
-### Deals and Handover
-- `POST /api/deals`: Deal contract create karna.
-- `GET /api/deals/my-deals`: Apni active aur completed deals dekhna.
-- `PUT /api/deals/:id/status`: Deal status advance karna (`ACCEPTED`, `ACTIVE`, `RETURNED`, `COMPLETED`, `CANCELLED`).
-
-### Reviews and Notifications
-- `POST /api/reviews`: Completed deal par 1-5 star review dena.
-- `GET /api/reviews/seller/:sellerId`: Student ke verified reviews fetch karna.
-- `GET /api/notifications`: Apne account ke notifications fetch karna (30s polling).
-- `PUT /api/notifications/:id/read`: Notification ko mark as read karna.
-
----
-
-## Project Setup and Running Locally
-
-### 1. Clone Repo and Install
+### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/swas78/DormDeal_AP_2026.git
-cd DormDeal_AP_2026
+git clone https://github.com/swastikmishra1425/DormDeal.git
+cd DormDeal/DormDeal_AP_2026
 
-# Backend dependencies install
+# Install backend dependencies
 cd backend && npm install
 
-# Frontend dependencies install
+# Install frontend dependencies
 cd ../frontend && npm install
 ```
 
-### 2. Environment Variables (.env)
-`backend/.env` file me basic variables set rehte hain:
+### 2. Configure Environment Variables
+Inside `DormDeal_AP_2026/backend/.env`:
 ```env
 PORT=5001
 NODE_ENV=development
@@ -158,49 +309,97 @@ JWT_SECRET=dormdeal_campus_jwt_secret_key_2026
 JWT_EXPIRE=30d
 CLIENT_URL=http://localhost:5173
 ```
-*Note: Agar MongoDB installed nahi hai toh backend automatic in-memory MongoDB run karke test student data seed kar deta hai.*
+*Note: If local MongoDB is not running, DormDeal automatically launches an embedded In-Memory MongoDB instance and auto-seeds test accounts out-of-the-box!*
 
-### Real Email aur Phone OTP Setup (Optional)
-Agar real email par OTP chahiye, toh `backend/.env` me Gmail App Password daal sakte hain:
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-16-char-app-password
-EMAIL_FROM_NAME="DormDeal Campus Marketplace"
-```
-Aur SMS ke liye Fast2SMS API key:
-```env
-FAST2SMS_API_KEY=your_fast2sms_api_key_here
-```
-Jab tak credentials nahi daale hote, tab tak backend terminal console par OTP print karta hai aur testing ke liye demo hint deta hai taaki koi phase atke na.
-
-### 3. Run Dev Server
-Root directory se:
+### 3. Start Development Servers
+From the root directory:
 ```bash
 npm run dev
 ```
-Ya fir dono ko alag alag terminals me start karein:
-- Backend: `cd backend && npm start` (Runs on `http://localhost:5001`)
-- Frontend: `cd frontend && npm run dev` (Runs on `http://localhost:5173`)
+Or run each service independently:
+```bash
+# Terminal 1: Backend API (:5001)
+cd DormDeal_AP_2026/backend && npm start
 
-### 4. Test Student Accounts for Evaluation
-- **Account 1**: `aarav.sharma@university.edu` | Password: `Password@123` | Hostel: Block B, Room 304
-- **Account 2**: `priya.patel@university.edu` | Password: `Password@123` | Hostel: Block A, Room 108
+# Terminal 2: Frontend Client (:5173)
+cd DormDeal_AP_2026/frontend && npm run dev
+```
+
+### 4. Default Seed Student Credentials
+| Identifier | Password | Hostel Block & Room | Role |
+| :--- | :--- | :--- | :--- |
+| `aarav.sharma@university.edu` | `Password@123` | Block B, Room 304 | Senior Student Seller |
+| `priya.patel@university.edu` | `Password@123` | Block A, Room 108 | Student Renter |
+
+---
+
+## Real OTP Configuration
+
+DormDeal supports sending actual verification OTPs to students' real email addresses and mobile phones:
+
+### Email Delivery (Gmail Free App Password)
+1. Visit [Google App Passwords](https://myaccount.google.com/apppasswords).
+2. Generate an App Password for **DormDeal** (16 characters).
+3. In `backend/.env`, uncomment and fill:
+   ```env
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_16_char_app_password
+   EMAIL_FROM_NAME="DormDeal Campus Marketplace"
+   ```
+
+### SMS Delivery (Indian +91 Numbers)
+1. Sign up at [Fast2SMS](https://www.fast2sms.com) (free test credits included).
+2. In `backend/.env`, set:
+   ```env
+   FAST2SMS_API_KEY=your_fast2sms_api_key_here
+   ```
+*(When credentials are configured, the demo OTP hint turns off automatically and sends directly to your actual inbox or phone).*
 
 ---
 
 ## Automated Test Suite
 
-Backend ka complete automated test suite run karne ke liye:
+Run the full end-to-end integration and unit test suite:
 ```bash
-cd backend
+cd DormDeal_AP_2026/backend
 npm test
 ```
-Result: **18 passed, 0 failed** across health, auth, OTP, registration, hostel location checks, rental security deposits, auto-expiry renewal, broadcast matching, and in-app notifications.
+
+### Output:
+```
+====================================================
+ STARTING DORMDEAL COMPLETE BACKEND API TEST SUITE
+====================================================
+[PASS] 1. GET /api/health returns healthy status
+[PASS] 2. GET /api/items returns marketplace items (count: 11)
+[PASS] 3. GET /api/items?type=RENT filters campus rental items
+[PASS] 4. GET /api/items?search=calculator searches across titles and descriptions
+[PASS] 5. GET /api/items/:id returns item with seller hostel and room details
+[PASS] 6. POST /api/auth/login succeeds for student Aarav Sharma
+[PASS] 7. GET /api/users/me returns authenticated student with hostel & room
+[PASS] 8. POST /api/auth/send-otp generates 6-digit OTP
+[PASS] 9. POST /api/auth/verify-otp verifies 6-digit code
+[PASS] 10. POST /api/auth/register registers student with hostel details
+[PASS] 11. POST /api/items blocks unaccepted disclaimer with 403 Forbidden
+[PASS] 12. PUT /api/users/accept-disclaimer accepts guidelines
+[PASS] 13. POST /api/items creates RENT listing with security deposit and defect disclosure
+[PASS] 14. PUT /api/items/:id/status updates status to RENTED
+[PASS] 15. PUT /api/items/:id/renew re-lists for 14 days
+[PASS] 16. POST /api/broadcasts creates campus broadcast request (3-Day TTL)
+[PASS] 17. POST /api/broadcasts/:id/match matches broadcast and creates notification for buyer
+[PASS] 18. GET /api/notifications retrieves match alert with fulfilling student hostel & phone
+====================================================
+ TEST SUMMARY: 18 PASSED, 0 FAILED
+====================================================
+```
 
 ---
 
-DormDeal - Advanced Programming & DBMS Course Project
-Rishihood University, Sonipat
-Team: Swastik Mishra (Lead), Kunal Agrawal, Abhijeet Saini, Tanishkka
+<div align="center">
+
+**DormDeal &bull; Advanced Programming & DBMS Course Project &bull; Rishihood University**  
+*Built by Swastik Mishra (Lead), Kunal Agrawal, Abhijeet Saini, and Tanishkka*
+
+</div>
