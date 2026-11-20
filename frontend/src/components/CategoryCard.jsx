@@ -1,81 +1,99 @@
 import React from 'react';
 import {
+  Shirt,
   Laptop,
   BookOpen,
-  Armchair,
-  Shirt,
-  Trophy,
-  Bike,
+  Printer,
+  ShoppingCart,
+  Pencil,
+  Home,
   Coffee,
-  Package,
+  Droplets,
+  Wind,
+  Trophy,
 } from 'lucide-react';
 
 export const CATEGORIES = [
   {
-    name: 'Electronics',
-    icon: Laptop,
-    description: 'Laptops, calculators, tablets & cables',
+    name: 'Clothing',
+    icon: Shirt,
+    description: 'Blazers, hoodies, ethnic formals & winter wear',
     badge: 'Popular',
   },
   {
-    name: 'Books & Study Material',
-    icon: BookOpen,
-    description: 'Coursebooks, syllabus guides & notes',
-    badge: 'Essential',
-  },
-  {
-    name: 'Cycles',
-    icon: Bike,
-    description: 'Campus commute bicycles & gear',
+    name: 'Electronics',
+    icon: Laptop,
+    description: 'Calculators, kettles, extension cords & cameras',
     badge: 'High Demand',
   },
   {
-    name: 'Hostel Essentials',
+    name: 'Notes',
+    icon: BookOpen,
+    description: 'Handwritten notebooks, question banks & cheat-sheets',
+    badge: 'Essential',
+  },
+  {
+    name: 'Printouts',
+    icon: Printer,
+    description: 'Lab manuals, syllabus packets & blueprints',
+  },
+  {
+    name: 'Groceries',
+    icon: ShoppingCart,
+    description: 'Instant noodles, snacks & hostel pantry items',
+  },
+  {
+    name: 'Stationery',
+    icon: Pencil,
+    description: 'Pens, drafters, geometry kits & art supplies',
+  },
+  {
+    name: 'Hostel Decor',
+    icon: Home,
+    description: 'Fairy lights, posters, shoe racks & storage organizers',
+  },
+  {
+    name: 'Utensils',
     icon: Coffee,
-    description: 'Kettles, fans, buckets & storage',
-    badge: 'Hostelites',
+    description: 'Mugs, plates, bowls, electric kettles & cutlery',
   },
   {
-    name: 'Furniture',
-    icon: Armchair,
-    description: 'Study chairs, tables & racks',
+    name: 'Skincare',
+    icon: Droplets,
+    description: 'Moisturizers, sunscreen, cleansers & body care',
   },
   {
-    name: 'Sports Equipment',
+    name: 'Haircare',
+    icon: Wind,
+    description: 'Hair dryers, oils, shampoo & styling tools',
+  },
+  {
+    name: 'Sports Items',
     icon: Trophy,
-    description: 'Rackets, balls, gym items',
-  },
-  {
-    name: 'Fashion',
-    icon: Shirt,
-    description: 'Hoodies, formal blazers & lab coats',
-  },
-  {
-    name: 'Other Items',
-    icon: Package,
-    description: 'Guitars, art supplies & accessories',
+    description: 'Badminton rackets, footballs, gym gear & yoga mats',
+    badge: 'Active',
   },
 ];
 
 const CategoryCard = ({ category, isSelected, onClick, count }) => {
-  const IconComponent = category.icon;
+  const IconComponent = category.icon || Shirt;
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative text-left p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between w-full h-full ${
+      className={`group text-left p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between w-full h-full ${
         isSelected
-          ? 'bg-gradient-to-br from-[#4F46E5] to-[#4338CA] text-white border-[#4F46E5] shadow-md -translate-y-1'
-          : 'bg-white hover:bg-indigo-50/40 text-[#111827] border-[#E5E7EB] hover:border-[#818CF8] shadow-card hover:shadow-card-hover hover:-translate-y-0.5'
+          ? 'bg-[#1c1c1d] text-[#FFFDF8] border-[#1c1c1d] shadow-sharp -translate-y-0.5'
+          : 'bg-white hover:bg-[#FFF9EE] text-[#1c1c1d] border-[#1c1c1d]/30 hover:border-[#1c1c1d] shadow-sm hover:shadow-sharp hover:-translate-y-0.5'
       }`}
     >
       <div className="flex items-start justify-between w-full mb-3">
         <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors border ${
             isSelected
-              ? 'bg-white/20 text-white'
-              : 'bg-indigo-50 text-[#4F46E5] group-hover:bg-[#4F46E5] group-hover:text-white'
+              ? 'bg-white/10 text-[#FFFDF8] border-white/20'
+              : 'bg-[#FFF9EE] text-[#1c1c1d] border-[#1c1c1d]/20 group-hover:bg-[#1c1c1d] group-hover:text-white'
           }`}
         >
           <IconComponent className="w-5 h-5" />
@@ -83,10 +101,10 @@ const CategoryCard = ({ category, isSelected, onClick, count }) => {
 
         {category.badge && (
           <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
               isSelected
-                ? 'bg-white/20 text-white'
-                : 'bg-indigo-50 text-[#4F46E5]'
+                ? 'bg-white/20 text-[#FFFDF8] border-white/30'
+                : 'bg-[#FDF3E0] text-[#1c1c1d] border-[#1c1c1d]/20'
             }`}
           >
             {category.badge}
@@ -97,14 +115,14 @@ const CategoryCard = ({ category, isSelected, onClick, count }) => {
       <div>
         <h3
           className={`text-sm font-bold tracking-tight mb-1 ${
-            isSelected ? 'text-white' : 'text-[#111827]'
+            isSelected ? 'text-[#FFFDF8]' : 'text-[#1c1c1d]'
           }`}
         >
           {category.name}
         </h3>
         <p
           className={`text-[11px] leading-snug line-clamp-2 ${
-            isSelected ? 'text-indigo-100' : 'text-[#6B7280]'
+            isSelected ? 'text-stone-300' : 'text-[#464649]'
           }`}
         >
           {category.description}
@@ -112,11 +130,11 @@ const CategoryCard = ({ category, isSelected, onClick, count }) => {
       </div>
 
       {count !== undefined && (
-        <div className="mt-3 pt-2 border-t border-white/20 text-[10px] font-semibold flex items-center justify-between">
-          <span className={isSelected ? 'text-indigo-200' : 'text-[#6B7280]'}>
+        <div className="mt-3 pt-2 border-t border-stone-200/50 text-[10px] font-semibold flex items-center justify-between">
+          <span className={isSelected ? 'text-stone-300' : 'text-[#464649]'}>
             {count} {count === 1 ? 'item' : 'items'}
           </span>
-          <span className={isSelected ? 'text-white' : 'text-[#4F46E5]'}>
+          <span className={isSelected ? 'text-[#FFFDF8]' : 'text-[#1c1c1d] font-bold'}>
             Explore →
           </span>
         </div>
@@ -126,4 +144,3 @@ const CategoryCard = ({ category, isSelected, onClick, count }) => {
 };
 
 export default CategoryCard;
-

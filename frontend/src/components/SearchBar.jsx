@@ -33,23 +33,23 @@ const SearchBar = ({
     sortBy !== 'newest';
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-[#E5E7EB] p-3 shadow-card transition-all">
-      <form onSubmit={handleFormSubmit} className="flex flex-col md:flex-row items-center gap-2.5">
+    <div className="w-full bg-white rounded-3xl border border-[#1c1c1d]/25 p-4 shadow-sm transition-all">
+      <form onSubmit={handleFormSubmit} className="flex flex-col md:flex-row items-center gap-3">
         {/* Main Search Input */}
         <div className="relative flex-1 w-full flex items-center">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3.5 pointer-events-none" />
+          <Search className="w-5 h-5 text-[#464649] absolute left-3.5 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search textbooks, cycles, calculators, study tables, kettles..."
-            className="w-full pl-10 pr-9 py-2.5 bg-gray-50 hover:bg-gray-100/70 focus:bg-white text-sm text-[#111827] placeholder-gray-400 rounded-xl border border-transparent focus:border-[#4F46E5] focus:outline-none transition-all"
+            placeholder="Search textbooks, cycles, calculators, kettles, blazers..."
+            className="w-full pl-10 pr-9 py-2.5 bg-[#FFF9EE]/50 hover:bg-[#FFF9EE] focus:bg-white text-sm text-[#1c1c1d] placeholder-stone-500 rounded-xl border border-[#1c1c1d]/20 focus:border-[#1c1c1d] focus:outline-none transition-all"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => onSearchChange('')}
-              className="absolute right-3 p-1 text-gray-400 hover:text-[#111827] rounded-md"
+              className="absolute right-3 p-1 text-[#464649] hover:text-[#1c1c1d] rounded-md"
             >
               <X className="w-4 h-4" />
             </button>
@@ -61,9 +61,9 @@ const SearchBar = ({
           <select
             value={selectedCategory}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full py-2.5 px-3 bg-gray-50 text-xs font-medium text-[#111827] rounded-xl border border-[#E5E7EB] focus:border-[#4F46E5] focus:outline-none"
+            className="w-full py-2.5 px-3 bg-white text-xs font-bold text-[#1c1c1d] rounded-xl border border-[#1c1c1d]/30 focus:border-[#1c1c1d] focus:outline-none"
           >
-            <option value="All">All Categories</option>
+            <option value="All">All 11 Categories</option>
             {CATEGORIES.map((cat) => (
               <option key={cat.name} value={cat.name}>
                 {cat.name}
@@ -72,27 +72,27 @@ const SearchBar = ({
           </select>
         </div>
 
-        {/* Actions Button Row */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold rounded-xl border transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl border transition-colors ${
               showFilters || hasActiveFilters
-                ? 'bg-indigo-50 border-[#4F46E5] text-[#4F46E5]'
-                : 'bg-white border-[#E5E7EB] text-[#6B7280] hover:bg-gray-50'
+                ? 'bg-[#1c1c1d] text-[#FFFDF8] border-[#1c1c1d]'
+                : 'bg-white border-[#1c1c1d]/30 text-[#1c1c1d] hover:bg-[#FFF9EE]'
             }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
             <span>Filters</span>
             {hasActiveFilters && (
-              <span className="w-2 h-2 rounded-full bg-[#4F46E5]"></span>
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
             )}
           </button>
 
           <button
             type="submit"
-            className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+            className="flex items-center justify-center gap-1.5 px-6 py-2.5 bg-[#1c1c1d] hover:bg-black text-[#FFFDF8] text-xs font-bold rounded-xl shadow-sharp border border-[#1c1c1d] transition-all"
           >
             <Search className="w-4 h-4" />
             <span>Search</span>
@@ -102,16 +102,16 @@ const SearchBar = ({
 
       {/* Expanded Filter Panel */}
       {showFilters && (
-        <div className="mt-3 pt-3 border-t border-[#E5E7EB] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="mt-4 pt-4 border-t border-[#1c1c1d]/15 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
           {/* Condition Filter */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#6B7280] mb-1 uppercase tracking-wider">
+            <label className="block text-[11px] font-bold text-[#464649] mb-1 uppercase tracking-wider">
               Condition
             </label>
             <select
               value={selectedCondition}
               onChange={(e) => onConditionChange(e.target.value)}
-              className="w-full p-2 bg-gray-50 text-xs text-[#111827] rounded-lg border border-[#E5E7EB] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full p-2 bg-white text-xs font-semibold text-[#1c1c1d] rounded-lg border border-[#1c1c1d]/30 focus:border-[#1c1c1d] focus:outline-none"
             >
               <option value="All">Any Condition</option>
               <option value="New">Brand New</option>
@@ -123,7 +123,7 @@ const SearchBar = ({
 
           {/* Min Price */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#6B7280] mb-1 uppercase tracking-wider">
+            <label className="block text-[11px] font-bold text-[#464649] mb-1 uppercase tracking-wider">
               Min Price (₹)
             </label>
             <input
@@ -131,13 +131,13 @@ const SearchBar = ({
               placeholder="Min ₹0"
               value={minPrice}
               onChange={(e) => onPriceChange('min', e.target.value)}
-              className="w-full p-2 bg-gray-50 text-xs text-[#111827] rounded-lg border border-[#E5E7EB] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full p-2 bg-white text-xs text-[#1c1c1d] rounded-lg border border-[#1c1c1d]/30 focus:border-[#1c1c1d] focus:outline-none"
             />
           </div>
 
           {/* Max Price */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#6B7280] mb-1 uppercase tracking-wider">
+            <label className="block text-[11px] font-bold text-[#464649] mb-1 uppercase tracking-wider">
               Max Price (₹)
             </label>
             <input
@@ -145,19 +145,19 @@ const SearchBar = ({
               placeholder="Max ₹50,000"
               value={maxPrice}
               onChange={(e) => onPriceChange('max', e.target.value)}
-              className="w-full p-2 bg-gray-50 text-xs text-[#111827] rounded-lg border border-[#E5E7EB] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full p-2 bg-white text-xs text-[#1c1c1d] rounded-lg border border-[#1c1c1d]/30 focus:border-[#1c1c1d] focus:outline-none"
             />
           </div>
 
           {/* Sort By */}
           <div>
-            <label className="block text-[11px] font-semibold text-[#6B7280] mb-1 uppercase tracking-wider">
+            <label className="block text-[11px] font-bold text-[#464649] mb-1 uppercase tracking-wider">
               Sort By
             </label>
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value)}
-              className="w-full p-2 bg-gray-50 text-xs text-[#111827] rounded-lg border border-[#E5E7EB] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full p-2 bg-white text-xs font-semibold text-[#1c1c1d] rounded-lg border border-[#1c1c1d]/30 focus:border-[#1c1c1d] focus:outline-none"
             >
               <option value="newest">Recently Listed (Newest)</option>
               <option value="price-asc">Price: Low to High</option>
@@ -172,7 +172,7 @@ const SearchBar = ({
               <button
                 type="button"
                 onClick={onClearFilters}
-                className="text-xs text-[#DC2626] hover:underline font-semibold flex items-center gap-1"
+                className="text-xs text-[#DC2626] hover:underline font-bold flex items-center gap-1"
               >
                 <X className="w-3.5 h-3.5" />
                 Reset all filters
@@ -186,4 +186,3 @@ const SearchBar = ({
 };
 
 export default SearchBar;
-
