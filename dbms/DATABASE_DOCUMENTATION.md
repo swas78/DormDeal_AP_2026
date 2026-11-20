@@ -1,28 +1,30 @@
-# DormDeal Database Architecture & DBMS Documentation
+# DormDeal Database Architecture and DBMS Documentation
 
-> **Course:** Advanced Programming & Database Management Systems (AP / DBMS)  
-> **System:** DormDeal — Campus Peer-to-Peer Student Marketplace & Rental Hub  
-> **Database Architecture Lead:** Tanishka  
-> **Core Backend Lead:** Swastik  
-> **Schema Location:** `dbms/03_schema.sql` (PostgreSQL 3NF/BCNF Relational DDL)  
-> **Queries Location:** `dbms/04_queries.sql` (Workload & Transaction Queries)  
-> **NoSQL ODM:** Node.js + Express.js + Mongoose (Document Mapping)
+Course: Advanced Programming and Database Management Systems (AP / DBMS)  
+System: DormDeal - Campus Peer-to-Peer Student Marketplace & Rental Hub  
+Database Architecture Lead: Tanishkka  
+Core Backend Lead: Swastik Mishra  
+Schema Location: `dbms/03_schema.sql` (PostgreSQL 3NF/BCNF Relational DDL)  
+Queries Location: `dbms/04_queries.sql` (Workload & Transaction Queries)  
+NoSQL ODM: Node.js + Express.js + Mongoose (Document Mapping)  
 
 ---
 
-## 1. Domain Overview & Entity Relationships
+## 1. Overview (Database Kaise Design Kiya Hai)
 
-The DormDeal database model represents a campus-contained circular economy. Every user is a student tied to university credentials and a specific campus hostel block and room number.
+DormDeal ka database basically campus circular economy ko model karta hai. Har student apne university enrollment ID, university email, phone number aur hostel block/room number se mapped rehta hai. 
 
-### Core Relational Entities:
-1. **`users`**: Represents enrolled students. Contains university enrollment ID, university email, phone number, hostel name, room number, academic year, and dynamically updated average trust ratings.
-2. **`categories`**: Taxonomy of 11 campus categories (`Clothing`, `Electronics`, `Notes`, `Printouts`, `Groceries`, `Stationery`, `Hostel Decor`, `Utensils`, `Skincare`, `Haircare`, `Sports Items`).
-3. **`items`**: Marketplace listings supporting both direct permanent sale (`SELL`) and short-term rentals (`RENT`). Includes pricing, defect disclosures, refundable security deposits, and a 14-day auto-expiry timestamp (`expires_at`).
-4. **`item_images`**: Multi-photo gallery linked to items with ordering (`display_order`) and primary image flag (`is_primary`).
-5. **`broadcast_requests`**: Reverse marketplace where students post what they need (*"Need Casio 991EX for tomorrow"*). Auto-expires after 3 days. Fellow students can click *"I Have This"* to fulfill the request.
-6. **`deals`**: Formal transaction contract state machine (`PENDING` $\to$ `ACCEPTED` $\to$ `ACTIVE` $\to$ `RETURNED` $\to$ `COMPLETED` $\to$ `CANCELLED`), linking buyer, seller, and item.
-7. **`reviews`**: Post-deal verified evaluations (1 to 5 stars + comments). Strictly 1 review per completed deal.
-8. **`notifications`**: In-app alerts when a broadcast request is matched or a deal progresses.
+Relational model me humne strict 3NF/BCNF normalization use ki hai taaki insertion, deletion aur update anomalies na aayen. Application runtime ke liye MongoDB + Mongoose use kiya hai with embedded document arrays taaki listing images aur items fast load ho sakein.
+
+### Core Tables / Collections:
+1. `users`: Enrolled students ka data (name, enrollment ID, hostel name, room number, avg rating).
+2. `categories`: 11 standard campus categories.
+3. `items`: Direct sale (`SELL`) aur short-term rental (`RENT`) listings with defect details, security deposit, aur 14-day expiry timestamp (`expires_at`).
+4. `item_images`: Items ke photos (multi-photo ordering ke sath).
+5. `broadcast_requests`: Reverse marketplace requests (jaise: *"Calculator chahiye exam ke liye"*), jo 3 din me auto-expire ho jaati hain.
+6. `deals`: Handover contract state machine (`PENDING` -> `ACCEPTED` -> `ACTIVE` -> `RETURNED` -> `COMPLETED` -> `CANCELLED`).
+7. `reviews`: Completed deals par 1 se 5 star feedback. Strictly 1 review per deal.
+8. `notifications`: In-app alerts jab broadcast match ho ya deal status update ho.
 
 ```
 +-----------------------------------------------------------------------------------------------------------------+

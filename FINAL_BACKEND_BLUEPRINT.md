@@ -237,7 +237,7 @@ Here are 5 thoughtful features that demonstrate real-world engineering maturity 
 ### 2. Copyable Rental Memo & Security Deposit Receipt
 * **Rationale**: Since security deposits are exchanged in cash or personal UPI, students occasionally argue over whether a deposit was ₹500 or ₹300, or when the return was promised.
 * **Implementation**: A 1-click **"Copy Rental Memo"** button that copies a formatted text agreement to the clipboard for sharing on WhatsApp:
-  > *"📋 DormDeal Campus Rental Memo*\n*Item: Apple iPad Pencil*\n*Renter: Priya Patel (Block C - 204)*\n*Lender: Aarav Sharma (Block B - 304)*\n*Daily Rate: ₹50 | Security Deposit Paid: ₹500*\n*Return Date: 24 Nov 2026, 6 PM"*
+  > *"[DormDeal Campus Rental Memo]*\n*Item: Apple iPad Pencil*\n*Renter: Priya Patel (Block C - 204)*\n*Lender: Aarav Sharma (Block B - 304)*\n*Daily Rate: ₹50 | Security Deposit Paid: ₹500*\n*Return Date: 24 Nov 2026, 6 PM"*
 
 ### 3. "Same Hostel Block" Proximity Filter
 * **Rationale**: If a student is studying in their hostel at 10:00 PM and needs a calculator or kettle, they prefer borrowing from someone in their own building rather than walking across campus.

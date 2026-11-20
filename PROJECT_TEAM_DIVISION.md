@@ -1,221 +1,180 @@
-# DormDeal Project Team Work Division & Responsibility Matrix
+# DormDeal Project Team Work Division
 
-> **Project:** DormDeal — University-Exclusive Peer-to-Peer Student Marketplace & Rental Hub  
-> **Course:** Advanced Programming & Database Management Systems (AP / DBMS)  
-> **Institution:** Rishihood University  
+Project: DormDeal - Campus Peer-to-Peer Student Marketplace & Rental Hub  
+Course: Advanced Programming (AP) & Database Management Systems (DBMS)  
+Institution: Rishihood University, Sonipat  
 
 ---
 
-## 👥 Executive Summary of Team Roles
+## Team Members and Roles Overview
 
-The workload is split strategically according to module complexity, frontend UX, database engineering, and core backend architecture:
+Yeh project chaar logon ke team ne banaya hai. Har member ka scope clear rakha gaya hai taaki viva aur evaluation ke time sab apna apna module independently explain kar sakein:
 
-| Team Member | Primary Domain | Core Responsibilities | Backend Contribution (Simple & Clear) |
+| Member | GitHub Username | Domain | Core Focus |
 | :--- | :--- | :--- | :--- |
-| **Swastik (Lead)** | **Core Backend & Architecture** | Auth & JWT, Contract State Machine, Auto-Expiry TTL Engine, Reverse Marketplace Matching, Multer Uploads | 80% Core Backend Architecture & Security |
-| **Kunal** | **Frontend (Part 1: Catalog & Listings)** | Product Cards (BUY/RENT), Detail Modal + WhatsApp Chat, Sell/Rent Dual Modal, 11-Category Search Filter | Items Query & Category Controller (`getItems`, `getItemById`) |
-| **Abhijeet** | **Frontend (Part 2: Deals & Broadcasts)** | ISO 3-Day Countdown Board, Handover Contracts Feed, Review Modal, 30s Notification Polling Hook | Reviews & Notifications Controller (`createReview`, `getMyNotifications`) |
-| **Tanishka** | **Database Architecture & DBMS** | 3NF/BCNF Relational Schema (`03_schema.sql`), ER Diagram & Normalization (`01_normalization.md`), SQL Queries, Mongoose Models, DB Seeder | Database Connection Lifecycle (`config/db.js`) & Health Check (`/api/health`) |
+| **Swastik Mishra (Lead)** | `swas78` | Core Backend & Architecture | Auth, JWT, OTP, Handover State Machine, Auto-Expiry TTL, Multer, Test Suite (~80% Backend). |
+| **Kunal Agrawal** | `kunal-13106` | Frontend Catalog & Items Query API | Marketplace cards, BUY/RENT toggles, WhatsApp deep-link, 11-category search filters, items read controller. |
+| **Abhijeet Saini** | `abhijeet-s24` | Frontend Deals/Broadcast & Alerts API | ISO Broadcast board (72h timer), Deals contract flow, Review modal, live notification polling, reviews/alerts routes. |
+| **Tanishkka** | `Tanishkka27` | Database Architecture (DBMS) & Connection | 3NF/BCNF relational SQL schema, ER diagram, normalization proofs, SQL analytical queries, Mongoose schemas, seeder, DB connection lifecycle. |
 
 ---
 
-## 1. 👑 Swastik — Project Lead & Core Backend Architecture
+## 1. Swastik Mishra - Project Lead and Core Backend Architecture
 
-Swastik designs and owns the foundational engine, security layers, transaction lifecycle, and server reliability.
+Swastik ne core backend system, security layers, transaction lifecycle aur server stability design ki hai:
 
-### Key Deliverables:
-1. **Authentication & Identity Security**:
-   - `backend/controllers/authController.js`: Full student registration with enrollment ID uniqueness, hostel block & room tracking.
-   - JWT stateless token issuance and verification middleware (`backend/middleware/authMiddleware.js`).
-   - `bcryptjs` password encryption (salt rounds = 10).
-   - Random 6-digit OTP engine with dual delivery (Nodemailer SMTP for real emails + SMS gateway fallback).
-   - Campus trading safety disclaimer gating (`disclaimerAccepted` checks with HTTP 403 enforcement).
-2. **Deals & Handover Contract State Machine**:
-   - `backend/controllers/dealController.js`: Formal transaction state machine (`PENDING` $\to$ `ACCEPTED` $\to$ `ACTIVE` $\to$ `RETURNED` $\to$ `COMPLETED` $\to$ `CANCELLED`).
-   - Security deposit tracking and escrow release rules for short-term rentals.
-   - Protection against unauthorized deal updates (only verified buyer or seller).
-3. **Auto-Expiry Engine & Lifecycle Automation**:
+### Key Work Done:
+1. **Authentication and Student Security**:
+   - `backend/controllers/authController.js`: Student registration jisme enrollment ID uniqueness, hostel block aur room number mandatory hai.
+   - JWT token issuance aur stateless verification middleware (`backend/middleware/authMiddleware.js`).
+   - Salted password hashing with `bcryptjs` (salt rounds = 10).
+   - Random 6-digit OTP delivery system jisme real email (Nodemailer) aur SMS gateway support hai with terminal console fallback for local testing.
+   - Campus trading safety disclaimer gating (`disclaimerAccepted` check with HTTP 403 enforcement).
+2. **Handover Contract State Machine**:
+   - `backend/controllers/dealController.js`: Deals ka state machine (`PENDING` -> `ACCEPTED` -> `ACTIVE` -> `RETURNED` -> `COMPLETED` -> `CANCELLED`).
+   - Short-term rentals ke liye refundable security deposit tracking.
+   - Unauthorized access protection (sirf deal ka buyer ya seller hi status update kar sakta hai).
+3. **Auto-Expiry Engine**:
    - 14-day auto-TTL for marketplace listings (`expiresAt`).
-   - One-click listing renewal endpoint (`PUT /api/items/:id/renew`) extending duration by +14 days.
-   - Automatic archiving when marked as SOLD or RENTED.
-4. **Reverse Marketplace Matchmaking Engine**:
+   - One-click listing renewal endpoint (`PUT /api/items/:id/renew`) jo duration ko +14 days extend kar deta hai.
+   - Item SOLD ya RENTED hone par automatic inventory archive.
+4. **Reverse Marketplace Matchmaking**:
    - `backend/controllers/broadcastController.js`: "I Have This!" fulfillment logic (`POST /api/broadcasts/:id/match`).
-   - Auto-generation of buyer notifications containing the fulfilling student's hostel, room, and WhatsApp contact.
+   - Buyer ko automatic notification dispatch jisme fulfilling student ka hostel, room number aur contact number included hota hai.
 5. **Multer Multi-Image Pipeline**:
-   - Multi-part upload processing for student profile photos and 3-photo product inspection galleries.
-   - Strict MIME-type checking and 5MB payload limits.
-6. **Dual-Mode Database & Server Reliability**:
-   - In-Memory MongoDB fallback (`mongodb-memory-server`) allowing zero-config evaluator testing.
-   - Automated test suite with 18 unit/integration tests passing (`node test-api.js`).
+   - Profile photos aur product ke 3 inspection images ka upload handler with MIME-type and 5MB size validation.
+6. **In-Memory MongoDB Support and Test Suite**:
+   - `mongodb-memory-server` automatic fallback jisse kisi bhi laptop par project bina install kiye turant chal jaata hai.
+   - 18 automated integration tests passing (`node test-api.js`).
 
 ---
 
-## 2. 🎨 Kunal — Frontend (Marketplace Catalog) & Backend (Items Read API)
+## 2. Kunal Agrawal - Frontend Catalog and Items Read API
 
-Kunal owns the visual discovery layer of the marketplace where students browse, filter, inspect, and list physical campus goods.
+Kunal ne marketplace discovery layer banaya hai jahan students items browse, filter aur list karte hain:
 
-### Frontend Ownership:
-- **`src/components/ProductCard.jsx`**:
-  - Direct sale (`BUY`) vs Short-term rental (`RENT`) badge rendering.
-  - Item condition pills (*Brand New*, *Like New*, *Gently Used*, *Heavily Used*).
-  - Defect alert tag (warns buyers if defects exist before opening).
-  - **"In Your Hostel!"** proximity badge (compares logged-in student's hostel block with seller's hostel block).
-  - Seller lifecycle management buttons: *"Mark as Sold"*, *"Mark as Rented"*, *"Renew +14d"*.
-- **`src/components/ProductDetailModal.jsx`**:
+### Frontend Responsibilities:
+- `src/components/ProductCard.jsx`:
+  - BUY (direct sale) aur RENT (short-term rental) badges.
+  - Item condition pills (Brand New, Like New, Gently Used, Heavily Used).
+  - Defect alert tag (agar item me scratch ya fault hai toh pehle hi alert dikhta hai).
+  - "In Your Hostel!" proximity badge (logged-in student aur seller ka hostel block compare karke).
+  - Seller lifecycle actions ("Mark as Sold", "Mark as Rented", "Renew +14d").
+- `src/components/ProductDetailModal.jsx`:
   - Multi-photo gallery preview with thumbnail switcher.
   - Retail MRP savings calculation (`originalPrice` vs `price`).
-  - Mandatory defect disclosure box (`hasDefects` & `defectDetails`).
-  - **1-Click WhatsApp Quick-Chat**: Auto-formats `https://wa.me/<phone>?text=<encoded_text>` pre-filling item title, price, and hostel meetup request.
-  - Direct student phone call (`tel:`) and university email (`mailto:`) action buttons.
-  - Handover deal initiation button (`Request Purchase / Rent`).
-- **`src/components/SellModal.jsx`**:
-  - Dual-mode listing toggle: **Direct Sale (BUY)** vs **Short-Term Rental (RENT)**.
-  - Rental pricing rate selector: per hour, day, week, or month.
-  - Mandatory refundable security deposit input.
-  - Transparent defect disclosure checkbox enforcing an explanation.
-  - Multi-photo drag-and-drop uploader (minimum 3 photos, cover selection).
-- **`src/components/SearchBar.jsx`**:
-  - Live debounced keyword search bar across titles and descriptions.
-  - Horizontal scrollable pill filter for the 11 university taxonomy categories.
-  - Sorting dropdown (Price Low-to-High, High-to-Low, Newest First).
+  - Mandatory defect disclosure box.
+  - 1-Click WhatsApp Quick-Chat button (`https://wa.me/<phone>?text=...`) jisme item ka naam aur price auto-filled hota hai.
+  - Direct call (`tel:`) aur email (`mailto:`) buttons.
+- `src/components/SellModal.jsx`:
+  - Dual-mode listing toggle: Direct Sale vs Short-Term Rental.
+  - Hourly, daily, weekly ya monthly rental period selector.
+  - Refundable security deposit input.
+  - Multi-photo drag-and-drop uploader.
+- `src/components/SearchBar.jsx`:
+  - Debounced search bar across title and description.
+  - 11 campus category horizontal pill filters.
+  - Sorting dropdown (Price Low-to-High, High-to-Low, Newest).
 
-### Backend Contribution (Simple & Clear):
-- **`backend/controllers/itemController.js` (Read & Search Queries)**:
-  - `getItems`: Simple Mongoose query fetching listings with filtering:
-    ```javascript
-    // Filter by category, type (SELL/RENT), and keyword search regex
-    const query = { status: 'AVAILABLE' };
-    if (category) query.category = category;
-    if (type) query.listingType = type;
-    if (search) query.title = { $regex: search, $options: 'i' };
-    ```
-  - `getItemById`: Fetching a single listing by ID and populating the seller's name, hostel block, and room number.
-- **`backend/routes/itemRoutes.js`**:
-  - Routing `GET /api/items` and `GET /api/items/:id`.
+### Backend Contribution:
+- `backend/controllers/itemController.js` (Read & Search Operations):
+  - `getItems`: Simple Mongoose query jisme category, type (SELL/RENT), aur keyword search regex filtered rehte hain.
+  - `getItemById`: Single item lookup with seller name, hostel block aur room number populated.
+- `backend/routes/itemRoutes.js`: Routing for `GET /api/items` and `GET /api/items/:id`.
 
 ---
 
-## 3. 📢 Abhijeet — Frontend (Deals & Broadcast) & Backend (Reviews & Alerts)
+## 3. Abhijeet Saini - Frontend Deals/Broadcast and Backend Alerts
 
-Abhijeet owns the collaborative and social features of DormDeal: the Reverse Marketplace (ISO Board), contract management, and post-transaction feedback.
+Abhijeet ne platform ke social, ISO broadcast aur transaction lifecycle components design kiye hain:
 
-### Frontend Ownership:
-- **`src/components/broadcast/BroadcastFeed.jsx` & `BroadcastCard.jsx`**:
-  - Campus ISO ("In Search Of") reverse marketplace board.
-  - Dynamic 3-day (72-hour) live countdown timer showing hours remaining before auto-expiry.
-  - Urgency indicators (*Urgent*, *Today*, *Flexible*).
-  - 1-Click **"I Have This!"** fulfillment button: allows any student with the requested item to immediately notify the requester.
-- **`src/components/broadcast/BroadcastModal.jsx`**:
-  - Clean form for students to broadcast urgent campus item needs (title, category, budget, urgency level, notes).
-- **`src/components/deals/DealsFeed.jsx`**:
-  - Contract management dashboard displaying active and completed handovers.
-  - Step-by-step state tracker: `PENDING` $\to$ `ACCEPTED` $\to$ `ACTIVE` $\to$ `RETURNED` $\to$ `COMPLETED`.
-  - Offline handover confirmation buttons (Approve Handover, Return Rental, Finalize Deal).
-- **`src/components/deals/ReviewModal.jsx`**:
-  - Post-transaction review dialog allowing verified participants of `COMPLETED` deals to leave 1-5 star ratings and comments.
-- **`src/hooks/useNotifications.js`**:
-  - 30-second live polling hook fetching notifications from `/api/notifications`.
-  - Unread badge counter in the navigation bar.
+### Frontend Responsibilities:
+- `src/components/broadcast/BroadcastFeed.jsx` aur `BroadcastCard.jsx`:
+  - Reverse Marketplace board jahan students apni zarooratein post karte hain.
+  - 3-day (72-hour) live countdown timer.
+  - Urgency indicators (Urgent, Today, Flexible).
+  - 1-Click "I Have This!" fulfill button.
+- `src/components/broadcast/BroadcastModal.jsx`:
+  - Urgent item request create karne ka form.
+- `src/components/deals/DealsFeed.jsx`:
+  - Active aur completed handovers ka contract tracker (`PENDING` se lekar `COMPLETED` tak).
+  - Physical handover confirm karne ke buttons.
+- `src/components/deals/ReviewModal.jsx`:
+  - Deal complete hone par 1 se 5 star verified rating aur review comment modal.
+- `src/hooks/useNotifications.js`:
+  - 30-second polling hook for in-app notifications.
 
-### Backend Contribution (Simple & Clear):
-- **`backend/controllers/reviewController.js`**:
-  - `createReview`:
-    - Checks if deal status is `COMPLETED`.
-    - Verifies strictly 1 review per deal.
-    - Saves the 1 to 5 star rating and recalculates the seller's overall `avgRating`:
-      ```javascript
-      // Simple rating recalculation
-      const allReviews = await Review.find({ seller: deal.seller });
-      const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
-      await User.findByIdAndUpdate(deal.seller, { avgRating: avg.toFixed(2), ratingCount: allReviews.length });
-      ```
-  - `getSellerReviews`: Retrieves all peer reviews for a student.
-- **`backend/controllers/notificationController.js`**:
-  - `getMyNotifications`: Simple endpoint fetching alerts where `recipient = req.user._id`.
-  - `markAsRead`: Simple update toggling `read = true`.
+### Backend Contribution:
+- `backend/controllers/reviewController.js`:
+  - `createReview`: Check karta hai ki deal `COMPLETED` hai ya nahi, duplicate review rokta hai, aur seller ka overall `avgRating` recalculate karta hai.
+  - `getSellerReviews`: Student profile ke verified reviews fetch karna.
+- `backend/controllers/notificationController.js`:
+  - `getMyNotifications`: Logged-in user ke notifications retrieve karna.
+  - `markAsRead`: Notification ko read mark karna.
 
 ---
 
-## 4. 🗄️ Tanishka — Database Architecture (DBMS) & Backend Connection
+## 4. Tanishkka - Database Architecture (DBMS) and DB Connection
 
-Tanishka leads the relational and document data modeling, database design documentation, ER diagramming, SQL workloads, and server connection initialization.
+Tanishkka ne poora relational aur document database architecture handle kiya hai:
 
-### DBMS & Database Ownership:
+### Database (DBMS) Responsibilities:
 - **Relational DDL Schema (`dbms/03_schema.sql`)**:
-  - Complete PostgreSQL DDL implementing 3NF/BCNF normalization.
-  - Primary keys, foreign key constraints with `ON DELETE CASCADE`, check constraints (`CHECK (price >= 0)`, `CHECK (rating BETWEEN 1 AND 5)`).
-  - Performance B-Tree indexes on `expires_at`, `category_id`, `seller_id`, and `hostel_name`.
+  - PostgreSQL 3NF/BCNF DDL with primary keys, foreign keys with ON DELETE CASCADE, CHECK constraints, aur performance B-Tree indexes.
 - **Normalization Proofs (`dbms/01_normalization.md`)**:
-  - Detailed academic proof tracing 0NF unnormalized student transactions through 1NF, 2NF, 3NF, and BCNF.
-  - Elimination of insertion, update, and deletion anomalies.
-- **Entity Relationship Model (`dbms/02_er_diagram.svg` / `.png`)**:
-  - Visual ER diagram illustrating cardinalities (1:1, 1:N) between `USERS`, `CATEGORIES`, `ITEMS`, `ITEM_IMAGES`, `BROADCAST_REQUESTS`, `DEALS`, `REVIEWS`, and `NOTIFICATIONS`.
-- **Analytical & Workload Queries (`dbms/04_queries.sql`)**:
-  - Practical SQL queries for evaluating platform health:
-    - *Query 1*: Top student sellers ranked by verified deal count and average rating.
-    - *Query 2*: Active rental escrow security deposits currently held.
-    - *Query 3*: Automated cron query finding expired listings (`expires_at < NOW()`).
-    - *Query 4*: Hostel block density analysis (trading volume across Block A, B, and C).
+  - Unnormalized 0NF data se lekar 1NF, 2NF, 3NF aur BCNF tak ka formal proof.
+  - Insertion, update aur deletion anomalies ka removal explanation.
+- **Entity Relationship Model (`dbms/02_er_diagram.svg` aur `.png`)**:
+  - Visual ER diagram jisme Users, Items, Categories, Deals, Broadcasts, Reviews aur Notifications ka 1:1 aur 1:N cardinality mapped hai.
+- **Analytical SQL Queries (`dbms/04_queries.sql`)**:
+  - Top student sellers query, active security deposits audit, aur auto-expiry cron queries.
 - **DBMS Documentation (`dbms/DATABASE_DOCUMENTATION.md`)**:
-  - Comprehensive report detailing schema architecture, indexing strategy, transaction isolation levels, and ACID compliance.
+  - Complete documentation on database indexing, ACID compliance aur transaction isolation.
 - **Mongoose Data Models (`backend/models/`)**:
-  - Translating relational tables into Mongoose document schemas (`User.js`, `Item.js`, `BroadcastRequest.js`, `Deal.js`, `Review.js`, `Notification.js`, `OTP.js`).
+  - Mongoose schemas (`User.js`, `Item.js`, `BroadcastRequest.js`, `Deal.js`, `Review.js`, `Notification.js`, `OTP.js`).
 - **Database Seeder (`backend/utils/seeder.js`)**:
-  - Script populating realistic Rishihood University student accounts, catalog items with defects/deposits, and sample ISO broadcasts.
+  - Test student accounts aur campus items generate karne ka script.
 
-### Backend Contribution (Simple & Clear):
-- **`backend/config/db.js` (Database Connection Handler)**:
-  - Clean Mongoose connection logic:
-    ```javascript
-    const mongoose = require('mongoose');
-
-    const connectDB = async () => {
-      try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`[Database] MongoDB Connected: ${conn.connection.host}`);
-      } catch (err) {
-        console.error(`[Database Error]: ${err.message}`);
-        // Triggers in-memory fallback if local MongoDB is offline
-      }
-    };
-    ```
-- **Health Check Route (`GET /api/health`)**:
-  - Simple ping endpoint returning server uptime, environment, and MongoDB connection status.
+### Backend Contribution:
+- `backend/config/db.js`:
+  - Database connection lifecycle handler (connecting to MongoDB URI, handling connection errors, aur fallback trigger karna).
+- Health Check Route (`GET /api/health`):
+  - Server status, uptime aur MongoDB connection check karne ka endpoint.
 
 ---
 
-## 📊 Summary Responsibility Matrix
+## Summary Responsibility Flow
 
 ```
-                      DORMDEAL PROJECT ARCHITECTURE
+                      DORMDEAL WORKFLOW
   =======================================================================
   
   [ FRONTEND - REACT 18 + VITE + TAILWIND ]
-  ├─ Marketplace Catalog & Detail Modals ─────── Kunal
-  ├─ Dual Sell/Rent Listing Form ─────────────── Kunal
-  ├─ Category Filter & Search Bar ────────────── Kunal
-  │
-  ├─ Reverse Marketplace ISO Board ───────────── Abhijeet
-  ├─ Deals Handover Contract Manager ─────────── Abhijeet
-  ├─ Post-Handover 1-5 Star Reviews ──────────── Abhijeet
-  └─ Live Notifications Polling ──────────────── Abhijeet
+  |-- Marketplace Catalog & Detail Modals -------- Kunal
+  |-- Dual Sell/Rent Listing Form ---------------- Kunal
+  |-- Category Filter & Search Bar --------------- Kunal
+  |
+  |-- Reverse Marketplace ISO Board -------------- Abhijeet
+  |-- Deals Handover Contract Manager ------------ Abhijeet
+  |-- Post-Handover 1-5 Star Reviews ------------- Abhijeet
+  `-- Live Notifications Polling ----------------- Abhijeet
 
   [ BACKEND - NODE.JS + EXPRESS.JS ]
-  ├─ Auth, JWT, OTP & Security Middleware ────── Swastik (Lead)
-  ├─ Handover Deals State Machine ────────────── Swastik (Lead)
-  ├─ Auto-Expiry Engine (14d/3d TTL) ─────────── Swastik (Lead)
-  ├─ Reverse Broadcast Matchmaking Engine ────── Swastik (Lead)
-  ├─ Multer Multi-Photo Pipeline ─────────────── Swastik (Lead)
-  │
-  ├─ Items Catalog Read & Search APIs ────────── Kunal (Simple API)
-  ├─ Reviews & Notifications APIs ────────────── Abhijeet (Simple API)
-  └─ Health Ping & DB Connection Handler ─────── Tanishka (Simple API)
+  |-- Auth, JWT, OTP & Security Middleware ------- Swastik (Lead)
+  |-- Handover Deals State Machine --------------- Swastik (Lead)
+  |-- Auto-Expiry Engine (14d/3d TTL) ------------ Swastik (Lead)
+  |-- Reverse Broadcast Matchmaking Engine ------- Swastik (Lead)
+  |-- Multer Multi-Photo Pipeline ---------------- Swastik (Lead)
+  |
+  |-- Items Catalog Read & Search APIs ----------- Kunal (Simple API)
+  |-- Reviews & Notifications APIs --------------- Abhijeet (Simple API)
+  `-- Health Ping & DB Connection Handler -------- Tanishkka (Simple API)
 
   [ DATABASE - DBMS & MONGOOSE ]
-  ├─ 3NF/BCNF Relational SQL Schema ──────────── Tanishka
-  ├─ ER Diagram & Normalization Proofs ───────── Tanishka
-  ├─ Workload & Analytical SQL Queries ───────── Tanishka
-  ├─ Mongoose Schemas & DB Seeder ────────────── Tanishka
-  └─ DBMS Architecture Documentation ────────── Tanishka
+  |-- 3NF/BCNF Relational SQL Schema ------------- Tanishkka
+  |-- ER Diagram & Normalization Proofs ---------- Tanishkka
+  |-- Workload & Analytical SQL Queries ---------- Tanishkka
+  |-- Mongoose Schemas & DB Seeder --------------- Tanishkka
+  `-- DBMS Architecture Documentation ----------- Tanishkka
   =======================================================================
 ```
