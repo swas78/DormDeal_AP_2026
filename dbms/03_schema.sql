@@ -1,18 +1,16 @@
 -- ============================================================
 -- DormDeal Campus Marketplace Schema (PostgreSQL 15+)
 -- Course: Advanced Programming & Database Management Systems
--- Team ID: T0140 | Student: Kunal Agrawal (2501010238)
--- Repository: swas78/DormDeal_AP_2026 / potatobun321/dorm
--- Checkpoint 2 (CP2) Deliverable: dbms/03_schema.sql
 -- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS dormdeal;
 SET search_path TO dormdeal, public;
 
 -- Drop existing tables if restarting (ordered to respect foreign key constraints)
+DROP TABLE IF EXISTS notifications CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS deals CASCADE;
+DROP TABLE IF EXISTS broadcast_requests CASCADE;
 DROP TABLE IF EXISTS item_images CASCADE;
 DROP TABLE IF EXISTS items CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
@@ -24,22 +22,26 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     user_id         SERIAL PRIMARY KEY,
     full_name       VARCHAR(100) NOT NULL,
+    enrollment_id   VARCHAR(50) NOT NULL UNIQUE,
     email           VARCHAR(255) NOT NULL UNIQUE
                     CHECK (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     phone           VARCHAR(20) UNIQUE,
-    hostel_name     VARCHAR(100) NOT NULL, -- e.g. 'Block B', 'Aryabhatta Hall', 'Girls Hostel 2'
+    hostel_name     VARCHAR(100) NOT NULL, -- e.g. 'Block B', 'Aryabhatta Hall', 'Girls Hostel 1'
     room_number     VARCHAR(30) NOT NULL,  -- e.g. 'Room 304', 'Room 208'
-    academic_year   VARCHAR(50),           -- e.g. '1st Year', '2nd Year', '3rd Year CSE', 'Graduated Alum'
+    academic_year   VARCHAR(50) DEFAULT '1st Year', -- e.g. '1st Year', '2nd Year', '3rd Year CSE'
+    profile_photo   TEXT DEFAULT '',
     avg_rating      NUMERIC(3,2) DEFAULT 5.00
                     CHECK (avg_rating BETWEEN 1.00 AND 5.00),
     rating_count    INT DEFAULT 0
                     CHECK (rating_count >= 0),
+    disclaimer_accepted BOOLEAN DEFAULT FALSE,
+    disclaimer_accepted_at TIMESTAMPTZ,
     is_active       BOOLEAN DEFAULT TRUE,
     created_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ------------------------------------------------------------
--- 2. CATEGORIES: Taxonomy for items (Clothing, Electronics, Notes, etc.)
+-- 2. CATEGORIES: Taxonomy for items (11 core campus categories)
 -- ------------------------------------------------------------
 CREATE TABLE categories (
     category_id     SERIAL PRIMARY KEY,
@@ -50,7 +52,7 @@ CREATE TABLE categories (
 );
 
 -- ------------------------------------------------------------
--- 3. ITEMS: Marketplace listings for direct sale or campus rental
+-- 3. ITEMS: Marketplace listings for direct sale (SELL) or rental (RENT)
 -- ------------------------------------------------------------
 CREATE TABLE items (
     item_id               SERIAL PRIMARY KEY,
@@ -59,7 +61,7 @@ CREATE TABLE items (
     title                 VARCHAR(255) NOT NULL,
     description           TEXT NOT NULL,
     listing_type          VARCHAR(10) NOT NULL
-                          CHECK (listing_type IN ('BUY', 'RENT')),
+                          CHECK (listing_type IN ('SELL', 'RENT')),
     item_condition        VARCHAR(20) NOT NULL
                           CHECK (item_condition IN ('Brand New', 'Like New', 'Good', 'Fair')),
     price                 NUMERIC(10,2) NOT NULL
@@ -75,9 +77,9 @@ CREATE TABLE items (
     open_to_bargaining    BOOLEAN DEFAULT FALSE,
     has_defects           BOOLEAN DEFAULT FALSE,
     defect_details        TEXT,
-    pickup_location       VARCHAR(255),
     status                VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE'
                           CHECK (status IN ('AVAILABLE', 'RESERVED', 'RENTED', 'SOLD', 'ARCHIVED')),
+    expires_at            TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP + INTERVAL '14 days'),
     created_at            TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at            TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 
@@ -91,7 +93,7 @@ CREATE TABLE items (
 );
 
 -- ------------------------------------------------------------
--- 4. ITEM_IMAGES: Photo gallery (UI enforces min 3 photos per upload)
+-- 4. ITEM_IMAGES: Photo gallery (1 to 5 images per listing)
 -- ------------------------------------------------------------
 CREATE TABLE item_images (
     image_id        SERIAL PRIMARY KEY,
@@ -105,7 +107,26 @@ CREATE TABLE item_images (
 );
 
 -- ------------------------------------------------------------
--- 5. DEALS: Transaction contracts for sales and rental handovers
+-- 5. BROADCAST_REQUESTS: Buyer "Want to Buy / Borrow" requests (3-Day TTL)
+-- ------------------------------------------------------------
+CREATE TABLE broadcast_requests (
+    broadcast_id    SERIAL PRIMARY KEY,
+    buyer_id        INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    category_id     INT NOT NULL REFERENCES categories(category_id) ON DELETE RESTRICT,
+    title           VARCHAR(120) NOT NULL,
+    max_budget      NUMERIC(10,2) NOT NULL CHECK (max_budget >= 0),
+    needed_by_date  VARCHAR(50) DEFAULT 'Today',
+    notes           TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'OPEN'
+                    CHECK (status IN ('OPEN', 'MATCHED', 'EXPIRED')),
+    matched_by      INT REFERENCES users(user_id) ON DELETE SET NULL,
+    matched_at      TIMESTAMPTZ,
+    expires_at      TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP + INTERVAL '3 days'),
+    created_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ------------------------------------------------------------
+-- 6. DEALS: Formal transaction contracts for sales and rentals
 -- ------------------------------------------------------------
 CREATE TABLE deals (
     deal_id                 SERIAL PRIMARY KEY,
@@ -113,7 +134,7 @@ CREATE TABLE deals (
     buyer_id                INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
     seller_id               INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
     deal_type               VARCHAR(10) NOT NULL
-                            CHECK (deal_type IN ('BUY', 'RENT')),
+                            CHECK (deal_type IN ('SELL', 'RENT')),
     agreed_price            NUMERIC(10,2) NOT NULL
                             CHECK (agreed_price >= 0),
     security_deposit_paid   NUMERIC(10,2) DEFAULT 0.00
@@ -132,21 +153,6 @@ CREATE TABLE deals (
 );
 
 -- ------------------------------------------------------------
--- 6. MESSAGES: Peer inquiries, negotiation, and campus handover chats
--- ------------------------------------------------------------
-CREATE TABLE messages (
-    message_id      SERIAL PRIMARY KEY,
-    deal_id         INT REFERENCES deals(deal_id) ON DELETE SET NULL,
-    item_id         INT REFERENCES items(item_id) ON DELETE SET NULL,
-    sender_id       INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    receiver_id     INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    content         TEXT NOT NULL,
-    sent_at         TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT chk_distinct_message_parties CHECK (sender_id <> receiver_id)
-);
-
--- ------------------------------------------------------------
 -- 7. REVIEWS: Peer rating evaluations after transaction completion
 -- ------------------------------------------------------------
 CREATE TABLE reviews (
@@ -162,39 +168,54 @@ CREATE TABLE reviews (
     CONSTRAINT chk_distinct_review_parties CHECK (reviewer_id <> reviewee_id)
 );
 
+-- ------------------------------------------------------------
+-- 8. NOTIFICATIONS: In-app alerts for broadcast matches & deal updates
+-- ------------------------------------------------------------
+CREATE TABLE notifications (
+    notification_id SERIAL PRIMARY KEY,
+    recipient_id    INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    sender_id       INT REFERENCES users(user_id) ON DELETE SET NULL,
+    title           VARCHAR(150) NOT NULL,
+    message         TEXT NOT NULL,
+    notification_type VARCHAR(30) DEFAULT 'BROADCAST_MATCH',
+    is_read         BOOLEAN DEFAULT FALSE,
+    created_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================================================
--- INDEXES for Query Optimization & Foreign Key Lookups
+-- INDEXES for Query Optimization & Lookups
 -- ============================================================
 CREATE INDEX idx_items_seller_id ON items(seller_id);
 CREATE INDEX idx_items_category_id ON items(category_id);
 CREATE INDEX idx_items_status ON items(status);
 CREATE INDEX idx_items_listing_type ON items(listing_type);
 CREATE INDEX idx_items_price ON items(price);
+CREATE INDEX idx_items_expires_at ON items(expires_at);
 
-CREATE INDEX idx_images_item_id ON item_images(item_id);
+CREATE INDEX idx_broadcasts_buyer ON broadcast_requests(buyer_id);
+CREATE INDEX idx_broadcasts_status ON broadcast_requests(status);
+CREATE INDEX idx_broadcasts_expires_at ON broadcast_requests(expires_at);
 
 CREATE INDEX idx_deals_buyer_id ON deals(buyer_id);
 CREATE INDEX idx_deals_seller_id ON deals(seller_id);
 CREATE INDEX idx_deals_item_id ON deals(item_id);
 CREATE INDEX idx_deals_status ON deals(deal_status);
 
-CREATE INDEX idx_messages_deal_id ON messages(deal_id);
-CREATE INDEX idx_messages_sender_receiver ON messages(sender_id, receiver_id);
-
 CREATE INDEX idx_reviews_reviewee ON reviews(reviewee_id);
+CREATE INDEX idx_notifications_recipient ON notifications(recipient_id);
 
 -- ============================================================
--- SEED DATA: DormDeal Core Categories (From products.js)
+-- SEED DATA: 11 Core Campus Categories
 -- ============================================================
 INSERT INTO categories (category_name, slug, description) VALUES
-('Clothing', 'clothing', 'Winter wear, campus hoodies, blazers, and ethnic wear'),
-('Electronics', 'electronics', 'Calculators, kettles, chargers, coolers, and cameras'),
-('Notes', 'notes', 'Handwritten spiral-bound subject notes and question banks'),
+('Clothing', 'clothing', 'Placement blazers, winter wear, campus hoodies, and formals'),
+('Electronics', 'electronics', 'Calculators, kettles, chargers, room coolers, and cameras'),
+('Notes', 'notes', 'Handwritten spiral notebooks and subject question banks'),
 ('Printouts', 'printouts', 'Lab manuals, syllabus packets, and reference sheets'),
 ('Groceries', 'groceries', 'Hostel snacks, packaged foods, and beverages'),
-('Stationery', 'stationery', 'Drafters, sheet holders, notebooks, pens, and geometry sets'),
-('Hostel Decor', 'hostel-decor', 'Curtains, ergonomic study chairs, fairy lights, and posters'),
-('Utensils', 'utensils', 'Induction pans, plates, mugs, spoons, and water bottles'),
+('Stationery', 'stationery', 'Mini drafters, sheet holders, compass sets, and markers'),
+('Hostel Decor', 'hostel-decor', 'Study chairs, bed tables, fairy lights, and organizers'),
+('Utensils', 'utensils', 'Induction pans, plates, spoons, mugs, and electric kettles'),
 ('Skincare', 'skincare', 'Daily personal grooming and sunscreen essentials'),
-('Haircare', 'haircare', 'Dryers, hair straighteners, combs, and oils'),
-('Sports Items', 'sports-items', 'Badminton racquets, gym dumbbells, tents, and cycles');
+('Haircare', 'haircare', 'Dryers, hair straighteners, and grooming accessories'),
+('Sports Items', 'sports-items', 'Badminton racquets, gym dumbbells, tents, and bicycles');

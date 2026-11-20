@@ -21,10 +21,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        'Please enter a valid email address',
-      ],
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please enter a valid university email'],
     },
     phone: {
       type: String,
@@ -37,9 +34,34 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
     },
+    hostelName: {
+      type: String,
+      required: [true, 'Hostel name is required (e.g. Block B, Aryabhatta Hall)'],
+      trim: true,
+    },
+    roomNumber: {
+      type: String,
+      required: [true, 'Room number is required (e.g. Room 304)'],
+      trim: true,
+    },
+    academicYear: {
+      type: String,
+      default: '1st Year',
+      trim: true,
+    },
     profilePhoto: {
       type: String,
       default: '',
+    },
+    avgRating: {
+      type: Number,
+      default: 5.0,
+      min: 1.0,
+      max: 5.0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
     },
     isEmailVerified: {
       type: Boolean,
@@ -63,21 +85,22 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Method to verify password during login
+// Method to verify password on login
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Hash password before saving if modified
-userSchema.pre('save', async function () {
+// Pre-save hook: Hash password with bcrypt before saving if modified
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    return;
+    return next ? next() : undefined;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  if (next) next();
 });
 
-// Remove sensitive fields when converting to JSON
+// Remove sensitive password field when serializing user to JSON
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
