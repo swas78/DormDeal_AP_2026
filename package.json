@@ -1,7 +1,7 @@
 {
-  "name": "campuskart",
-  "version": "1.0.0",
-  "description": "CampusKart - University Student Marketplace (OLX for University Students)",
+  "name": "dormdeal",
+  "version": "2.0.0",
+  "description": "DormDeal - University-Exclusive Peer-to-Peer Student Marketplace & Rental Hub",
   "scripts": {
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

@@ -8,18 +8,18 @@ const errorHandler = (err, req, res, next) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message || 'Internal Server Error';
 
-  // Mongoose bad ObjectId
+  // Bad ObjectId
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     statusCode = 404;
-    message = 'Resource not found (invalid identifier)';
+    message = 'Resource not found (invalid ID format)';
   }
 
-  // Mongoose duplicate key error (code 11000)
+  // Duplicate key (code 11000)
   if (err.code === 11000) {
     statusCode = 400;
     const field = Object.keys(err.keyValue || {})[0] || 'field';
-    const value = err.keyValue ? err.keyValue[field] : '';
-    message = `An account with this ${field} ("${value}") already exists.`;
+    const val = err.keyValue ? err.keyValue[field] : '';
+    message = `An account or record with this ${field} ("${val}") already exists.`;
   }
 
   // Mongoose validation error
@@ -33,7 +33,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'MulterError') {
     statusCode = 400;
     if (err.code === 'LIMIT_FILE_SIZE') {
-      message = 'File size too large. Maximum allowed size is 5MB.';
+      message = 'File size is too large. Maximum allowed size is 5MB.';
     }
   }
 
@@ -48,4 +48,3 @@ module.exports = {
   notFound,
   errorHandler,
 };
-

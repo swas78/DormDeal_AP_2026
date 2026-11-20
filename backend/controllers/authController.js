@@ -4,7 +4,7 @@ const generateToken = require('../utils/generateToken');
 const { generate6DigitOTP, deliverOTP } = require('../utils/generateOTP');
 
 /**
- * @desc    Send OTP to university email or phone
+ * @desc    Send 6-digit OTP code
  * @route   POST /api/auth/send-otp
  * @access  Public
  */
@@ -15,18 +15,18 @@ const sendOTP = async (req, res, next) => {
     if (!identifier || typeof identifier !== 'string' || !identifier.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'A valid email or phone number is required to send an OTP.',
+        message: 'A valid email or phone number is required.',
       });
     }
 
     const cleanIdentifier = identifier.trim().toLowerCase();
 
-    // Check if purpose is registration and user already exists
+    // Check if account already exists when purpose is registration
     if (purpose === 'registration') {
-      const existingUser = await User.findOne({
+      const existing = await User.findOne({
         $or: [{ email: cleanIdentifier }, { phone: cleanIdentifier }],
       });
-      if (existingUser) {
+      if (existing) {
         return res.status(400).json({
           success: false,
           message: 'An account with this email or phone is already registered.',
@@ -34,43 +34,36 @@ const sendOTP = async (req, res, next) => {
       }
     }
 
-    // Invalidate any existing unverified OTPs for this identifier & purpose
+    // Invalidate stale unverified OTPs for this identifier
     await OTP.deleteMany({ identifier: cleanIdentifier, purpose });
 
-    // Generate new 6-digit OTP
-    const otpCode = generate6DigitOTP();
-
-    // Save in DB with 5-minute TTL
+    const code = generate6DigitOTP();
     await OTP.create({
       identifier: cleanIdentifier,
-      otp: otpCode,
+      otp: code,
       purpose,
       verified: false,
     });
 
-    // Deliver OTP (or simulate in development/demo mode)
-    const delivery = await deliverOTP(cleanIdentifier, otpCode, purpose);
+    const delivery = await deliverOTP(cleanIdentifier, code, purpose);
 
-    const responsePayload = {
+    const payload = {
       success: true,
       message: `Verification OTP dispatched to ${cleanIdentifier}. Valid for 5 minutes.`,
-      isDemoMode: delivery.isDemoMode,
     };
 
-    // Include demo OTP in development/demo mode so testers don't need real SMS/email credentials
     if (delivery.isDemoMode && process.env.NODE_ENV !== 'production') {
-      responsePayload.demoOtp = otpCode;
-      responsePayload.demoHint = 'For demo/evaluation purposes, use this code to verify.';
+      payload.demoOtp = code;
     }
 
-    return res.status(200).json(responsePayload);
-  } catch (error) {
-    next(error);
+    return res.status(200).json(payload);
+  } catch (err) {
+    next(err);
   }
 };
 
 /**
- * @desc    Verify OTP code
+ * @desc    Verify 6-digit OTP code
  * @route   POST /api/auth/verify-otp
  * @access  Public
  */
@@ -101,16 +94,15 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
-    // Mark verified
     record.verified = true;
     await record.save();
 
     return res.status(200).json({
       success: true,
-      message: 'OTP verification successful! You can now proceed.',
+      message: 'OTP verified successfully.',
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -128,30 +120,31 @@ const registerUser = async (req, res, next) => {
       phone,
       password,
       confirmPassword,
+      hostelName,
+      roomNumber,
+      academicYear,
       termsAccepted,
       otp,
     } = req.body;
 
-    // Validate required fields
-    if (!fullName || !enrollmentId || !email || !phone || !password) {
+    if (!fullName || !enrollmentId || !email || !phone || !password || !hostelName || !roomNumber) {
       return res.status(400).json({
         success: false,
-        message: 'Please fill in all required registration fields.',
+        message: 'Please provide all required fields (Name, Enrollment ID, Email, Phone, Password, Hostel, Room).',
       });
     }
 
     if (termsAccepted !== true && termsAccepted !== 'true') {
       return res.status(400).json({
         success: false,
-        message: 'You must agree to the Terms and Conditions to register.',
+        message: 'You must agree to the DormDeal campus guidelines and terms.',
       });
     }
 
-    // Validate password match
     if (confirmPassword && password !== confirmPassword) {
       return res.status(400).json({
         success: false,
-        message: 'Passwords do not match. Please re-enter identical passwords.',
+        message: 'Passwords do not match.',
       });
     }
 
@@ -166,45 +159,42 @@ const registerUser = async (req, res, next) => {
     const cleanEnrollment = enrollmentId.trim().toUpperCase();
     const cleanPhone = phone.trim();
 
-    // Check uniqueness
-    const userWithEnrollment = await User.findOne({ enrollmentId: cleanEnrollment });
-    if (userWithEnrollment) {
+    // Check duplicate accounts
+    const dupEnroll = await User.findOne({ enrollmentId: cleanEnrollment });
+    if (dupEnroll) {
       return res.status(400).json({
         success: false,
         message: `University Enrollment ID "${cleanEnrollment}" is already registered.`,
       });
     }
 
-    const userWithEmail = await User.findOne({ email: cleanEmail });
-    if (userWithEmail) {
+    const dupEmail = await User.findOne({ email: cleanEmail });
+    if (dupEmail) {
       return res.status(400).json({
         success: false,
-        message: `Email "${cleanEmail}" is already registered. Please login instead.`,
+        message: `Email "${cleanEmail}" is already registered.`,
       });
     }
 
-    const userWithPhone = await User.findOne({ phone: cleanPhone });
-    if (userWithPhone) {
+    const dupPhone = await User.findOne({ phone: cleanPhone });
+    if (dupPhone) {
       return res.status(400).json({
         success: false,
         message: `Phone number "${cleanPhone}" is already registered.`,
       });
     }
 
-    // Check OTP verification
-    let isPhoneOrEmailVerified = false;
+    // Check verified OTP if provided
+    let isVerified = false;
     if (otp) {
-      const otpRecord = await OTP.findOne({
+      const otpRec = await OTP.findOne({
         identifier: { $in: [cleanEmail, cleanPhone] },
         otp: otp.toString().trim(),
         verified: true,
       });
-      if (otpRecord) {
-        isPhoneOrEmailVerified = true;
-      }
+      if (otpRec) isVerified = true;
     }
 
-    // Handle profile photo from upload or default
     let profilePhotoUrl = '';
     if (req.file) {
       profilePhotoUrl = `/uploads/${req.file.filename}`;
@@ -212,24 +202,26 @@ const registerUser = async (req, res, next) => {
       profilePhotoUrl = req.body.profilePhoto;
     }
 
-    // Create user
     const newUser = await User.create({
       fullName: fullName.trim(),
       enrollmentId: cleanEnrollment,
       email: cleanEmail,
       phone: cleanPhone,
       password,
+      hostelName: hostelName.trim(),
+      roomNumber: roomNumber.trim(),
+      academicYear: academicYear ? academicYear.trim() : '1st Year',
       profilePhoto: profilePhotoUrl,
-      isEmailVerified: isPhoneOrEmailVerified,
-      isPhoneVerified: isPhoneOrEmailVerified,
-      disclaimerAccepted: false, // Must be accepted on Page 3
+      isEmailVerified: isVerified,
+      isPhoneVerified: isVerified,
+      disclaimerAccepted: false,
     });
 
     const token = generateToken(newUser._id);
 
     return res.status(201).json({
       success: true,
-      message: 'Student registration completed successfully!',
+      message: 'Student account created successfully!',
       token,
       user: {
         _id: newUser._id,
@@ -237,20 +229,23 @@ const registerUser = async (req, res, next) => {
         enrollmentId: newUser.enrollmentId,
         email: newUser.email,
         phone: newUser.phone,
+        hostelName: newUser.hostelName,
+        roomNumber: newUser.roomNumber,
+        academicYear: newUser.academicYear,
         profilePhoto: newUser.profilePhoto,
-        isEmailVerified: newUser.isEmailVerified,
-        isPhoneVerified: newUser.isPhoneVerified,
+        avgRating: newUser.avgRating,
+        ratingCount: newUser.ratingCount,
         disclaimerAccepted: newUser.disclaimerAccepted,
         createdAt: newUser.createdAt,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
 /**
- * @desc    Authenticate user & get token
+ * @desc    Authenticate student & get token (supports Email OR Phone)
  * @route   POST /api/auth/login
  * @access  Public
  */
@@ -265,11 +260,11 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    const cleanIdentifier = loginIdentifier.trim().toLowerCase();
+    const cleanId = loginIdentifier.trim().toLowerCase();
 
-    // Look for user by email OR phone
+    // Match by email OR phone
     const user = await User.findOne({
-      $or: [{ email: cleanIdentifier }, { phone: loginIdentifier.trim() }],
+      $or: [{ email: cleanId }, { phone: loginIdentifier.trim() }],
     });
 
     if (!user) {
@@ -291,7 +286,7 @@ const loginUser = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Welcome back to CampusKart!',
+      message: 'Welcome back to DormDeal!',
       token,
       user: {
         _id: user._id,
@@ -299,27 +294,30 @@ const loginUser = async (req, res, next) => {
         enrollmentId: user.enrollmentId,
         email: user.email,
         phone: user.phone,
+        hostelName: user.hostelName,
+        roomNumber: user.roomNumber,
+        academicYear: user.academicYear,
         profilePhoto: user.profilePhoto,
-        isEmailVerified: user.isEmailVerified,
-        isPhoneVerified: user.isPhoneVerified,
+        avgRating: user.avgRating,
+        ratingCount: user.ratingCount,
         disclaimerAccepted: user.disclaimerAccepted,
         createdAt: user.createdAt,
       },
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
 /**
- * @desc    Logout user (token-based invalidation/acknowledgement)
+ * @desc    Logout student session
  * @route   POST /api/auth/logout
  * @access  Public
  */
 const logoutUser = async (req, res) => {
   return res.status(200).json({
     success: true,
-    message: 'Logged out successfully from CampusKart session.',
+    message: 'Logged out successfully from DormDeal session.',
   });
 };
 
@@ -346,14 +344,14 @@ const resetPassword = async (req, res, next) => {
       });
     }
 
-    const cleanIdentifier = identifier.trim().toLowerCase();
+    const cleanId = identifier.trim().toLowerCase();
 
-    const otpRecord = await OTP.findOne({
-      identifier: cleanIdentifier,
+    const otpRec = await OTP.findOne({
+      identifier: cleanId,
       otp: otp.toString().trim(),
     });
 
-    if (!otpRecord) {
+    if (!otpRec) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired OTP code.',
@@ -361,7 +359,7 @@ const resetPassword = async (req, res, next) => {
     }
 
     const user = await User.findOne({
-      $or: [{ email: cleanIdentifier }, { phone: identifier.trim() }],
+      $or: [{ email: cleanId }, { phone: identifier.trim() }],
     });
 
     if (!user) {
@@ -373,14 +371,14 @@ const resetPassword = async (req, res, next) => {
 
     user.password = newPassword;
     await user.save();
-    await OTP.deleteMany({ identifier: cleanIdentifier });
+    await OTP.deleteMany({ identifier: cleanId });
 
     return res.status(200).json({
       success: true,
       message: 'Password reset successfully! You can now log in with your new password.',
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -392,4 +390,3 @@ module.exports = {
   logoutUser,
   resetPassword,
 };
-

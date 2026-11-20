@@ -1,7 +1,7 @@
 {
-  "name": "campuskart-backend",
-  "version": "1.0.0",
-  "description": "CampusKart Backend - University Student Marketplace",
+  "name": "dormdeal-backend",
+  "version": "2.0.0",
+  "description": "DormDeal Backend - Campus Peer-to-Peer Student Marketplace & Rental Hub",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,15 +11,17 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.10",
-    "express": "^5.3.0",
-    "helmet": "^8.3.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.12.1",
-    "multer": "^2.5.0"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^10.6.1"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^11.3.0"
+    "mongodb-memory-server": "^10.1.4",
+    "nodemon": "^3.1.9"
   }
 }

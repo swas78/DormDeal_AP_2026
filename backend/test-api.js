@@ -31,7 +31,7 @@ function makeRequest(options, postData = null) {
 
 async function runTests() {
   console.log('====================================================');
-  console.log(' STARTING CAMPUSKART FULL API SUITE TESTS');
+  console.log(' STARTING DORMDEAL COMPLETE BACKEND API TEST SUITE');
   console.log('====================================================');
 
   let passed = 0;
@@ -48,7 +48,7 @@ async function runTests() {
   }
 
   try {
-    // 1. Health Check
+    // 1. Health check
     const health = await makeRequest({
       hostname: 'localhost',
       port: 5001,
@@ -57,56 +57,56 @@ async function runTests() {
     });
     assert(health.status === 200 && health.data.status === 'healthy', '1. GET /api/health returns healthy status');
 
-    // 2. Public Products List
-    const productsRes = await makeRequest({
+    // 2. Public Items List
+    const itemsRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
-      path: '/api/products',
+      path: '/api/items',
       method: 'GET',
     });
     assert(
-      productsRes.status === 200 && Array.isArray(productsRes.data.products) && productsRes.data.products.length > 0,
-      `2. GET /api/products returns seeded products (count: ${productsRes.data.products?.length})`
+      itemsRes.status === 200 && Array.isArray(itemsRes.data.items) && itemsRes.data.items.length > 0,
+      `2. GET /api/items returns marketplace items (count: ${itemsRes.data.items?.length})`
     );
 
-    // 3. Category Filter
-    const catRes = await makeRequest({
+    // 3. Filter by listingType = RENT
+    const rentRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
-      path: '/api/products?category=Cycles',
+      path: '/api/items?type=RENT',
       method: 'GET',
     });
     assert(
-      catRes.status === 200 && catRes.data.products.every((p) => p.category === 'Cycles'),
-      '3. GET /api/products?category=Cycles correctly filters category'
+      rentRes.status === 200 && rentRes.data.items.every((i) => i.listingType === 'RENT'),
+      '3. GET /api/items?type=RENT filters campus rental items'
     );
 
-    // 4. Keyword Search
+    // 4. Keyword search
     const searchRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
-      path: '/api/products?search=calculator',
+      path: '/api/items?search=calculator',
       method: 'GET',
     });
     assert(
-      searchRes.status === 200 && searchRes.data.products.some((p) => p.title.toLowerCase().includes('calculator')),
-      '4. GET /api/products?search=calculator searches title/description'
+      searchRes.status === 200 && searchRes.data.items.some((i) => i.title.toLowerCase().includes('calculator')),
+      '4. GET /api/items?search=calculator searches across titles and descriptions'
     );
 
-    // 5. Single Product by ID
-    const sampleProductId = productsRes.data.products[0]._id;
-    const singleProduct = await makeRequest({
+    // 5. Single item details with seller hostel info
+    const sampleItemId = itemsRes.data.items[0]._id;
+    const singleRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
-      path: `/api/products/${sampleProductId}`,
+      path: `/api/items/${sampleItemId}`,
       method: 'GET',
     });
     assert(
-      singleProduct.status === 200 && singleProduct.data.product._id === sampleProductId,
-      '5. GET /api/products/:id retrieves single product details'
+      singleRes.status === 200 && Boolean(singleRes.data.item.seller.hostelName),
+      '5. GET /api/items/:id returns item with seller hostel and room details'
     );
 
-    // 6. Login with Seeded User
+    // 6. Login with seeded student
     const loginRes = await makeRequest(
       {
         hostname: 'localhost',
@@ -120,14 +120,11 @@ async function runTests() {
         password: 'Password@123',
       }
     );
-    assert(
-      loginRes.status === 200 && Boolean(loginRes.data.token),
-      `6. POST /api/auth/login succeeds for student Aarav Sharma with JWT token`
-    );
+    assert(loginRes.status === 200 && Boolean(loginRes.data.token), '6. POST /api/auth/login succeeds for student Aarav Sharma');
 
     const token = loginRes.data.token;
 
-    // 7. Protected Route - Get Current User (/api/users/me)
+    // 7. Protected route: /api/users/me
     const meRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
@@ -136,8 +133,8 @@ async function runTests() {
       headers: { Authorization: `Bearer ${token}` },
     });
     assert(
-      meRes.status === 200 && meRes.data.user.email === 'aarav.sharma@university.edu',
-      '7. GET /api/users/me returns authenticated student profile'
+      meRes.status === 200 && meRes.data.user.hostelName === 'Block B',
+      '7. GET /api/users/me returns authenticated student with hostel & room'
     );
 
     // 8. Send OTP Flow
@@ -177,12 +174,9 @@ async function runTests() {
         purpose: 'registration',
       }
     );
-    assert(
-      verifyOtpRes.status === 200 && verifyOtpRes.data.success,
-      '9. POST /api/auth/verify-otp validates 6-digit code'
-    );
+    assert(verifyOtpRes.status === 200 && verifyOtpRes.data.success, '9. POST /api/auth/verify-otp verifies 6-digit code');
 
-    // 10. Register New Student
+    // 10. Register new student with hostel and room
     const regRes = await makeRequest(
       {
         hostname: 'localhost',
@@ -192,30 +186,29 @@ async function runTests() {
         headers: { 'Content-Type': 'application/json' },
       },
       {
-        fullName: 'Vikramaditya Roy',
+        fullName: 'Sameer Sen',
         enrollmentId: `2024CSB${Math.floor(1000 + Math.random() * 9000)}`,
         email: testNewEmail,
         phone: `+91 ${Math.floor(9000000000 + Math.random() * 999999999)}`,
         password: 'Password@123',
         confirmPassword: 'Password@123',
+        hostelName: 'Block C',
+        roomNumber: 'Room 214',
+        academicYear: '2nd Year',
         termsAccepted: true,
         otp: generatedOtp,
       }
     );
-    assert(
-      regRes.status === 201 && regRes.data.success && Boolean(regRes.data.token),
-      '10. POST /api/auth/register creates new student account and returns token'
-    );
+    assert(regRes.status === 201 && Boolean(regRes.data.token), '10. POST /api/auth/register registers student with hostel details');
 
     const newUserToken = regRes.data.token;
 
-    // 11. Disclaimer Enforcement: new student has disclaimerAccepted: false
-    // Attempting to create product without disclaimer should return 403
-    const blockedProduct = await makeRequest(
+    // 11. Disclaimer enforcement blocks item creation before acceptance
+    const blockedRes = await makeRequest(
       {
         hostname: 'localhost',
         port: 5001,
-        path: '/api/products',
+        path: '/api/items',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,19 +216,19 @@ async function runTests() {
         },
       },
       {
-        title: 'Unauthorized Test Listing',
-        description: 'Should be blocked until disclaimer accepted',
+        title: 'Unauthorized Item',
+        description: 'Should be rejected',
         price: 100,
         category: 'Electronics',
-        condition: 'Good',
+        itemCondition: 'Good',
       }
     );
     assert(
-      blockedProduct.status === 403 && blockedProduct.data.requiresDisclaimer === true,
-      '11. POST /api/products blocks unaccepted disclaimer with 403 Forbidden'
+      blockedRes.status === 403 && blockedRes.data.requiresDisclaimer === true,
+      '11. POST /api/items blocks unaccepted disclaimer with 403 Forbidden'
     );
 
-    // 12. Accept Disclaimer
+    // 12. Accept disclaimer
     const acceptRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
@@ -243,17 +236,14 @@ async function runTests() {
       method: 'PUT',
       headers: { Authorization: `Bearer ${newUserToken}` },
     });
-    assert(
-      acceptRes.status === 200 && acceptRes.data.user.disclaimerAccepted === true,
-      '12. PUT /api/users/accept-disclaimer accepts campus guidelines'
-    );
+    assert(acceptRes.status === 200 && acceptRes.data.user.disclaimerAccepted === true, '12. PUT /api/users/accept-disclaimer accepts guidelines');
 
-    // 13. Create Product (Now allowed after disclaimer acceptance)
-    const newProductRes = await makeRequest(
+    // 13. Create a Rental listing with mandatory defect disclosure
+    const createRentalRes = await makeRequest(
       {
         hostname: 'localhost',
         port: 5001,
-        path: '/api/products',
+        path: '/api/items',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,27 +251,33 @@ async function runTests() {
         },
       },
       {
-        title: 'Arduino Uno R3 Starter Kit with Sensors',
-        description: 'Used for Embedded Systems lab course. Includes breadboard, jumper wires, sensors, and USB cable.',
-        price: 950,
-        category: 'Electronics',
-        condition: 'Like New',
-        imageUrl: 'https://images.unsplash.com/photo-1553406830-ef2513450d76?auto=format&fit=crop&w=800&q=80',
+        title: 'Havells 3-Speed Table Fan for Hostel',
+        description: 'Powerful breeze for summer hostel rooms. Oscillating head.',
+        listingType: 'RENT',
+        category: 'Hostel Decor',
+        itemCondition: 'Good',
+        price: 50, // ₹50/day
+        rentalPeriod: 'day',
+        securityDeposit: 400,
+        listingDurationDays: 14,
+        openToBargaining: false,
+        hasDefects: true,
+        defectDetails: 'Slight humming sound on speed 3, works perfectly.',
       }
     );
     assert(
-      newProductRes.status === 201 && newProductRes.data.success && newProductRes.data.product.price === 950,
-      '13. POST /api/products successfully creates new listing after disclaimer accepted'
+      createRentalRes.status === 201 && createRentalRes.data.item.listingType === 'RENT',
+      '13. POST /api/items creates RENT listing with security deposit and defect disclosure'
     );
 
-    const createdProductId = newProductRes.data.product._id;
+    const createdRentalId = createRentalRes.data.item._id;
 
-    // 14. Update Product Listing
-    const updateRes = await makeRequest(
+    // 14. 1-Click Status Update ("Mark as Rented")
+    const statusRes = await makeRequest(
       {
         hostname: 'localhost',
         port: 5001,
-        path: `/api/products/${createdProductId}`,
+        path: `/api/items/${createdRentalId}/status`,
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -289,26 +285,72 @@ async function runTests() {
         },
       },
       {
-        price: 850,
-        description: 'Price reduced! Quick campus deal.',
+        status: 'RENTED',
+      }
+    );
+    assert(statusRes.status === 200 && statusRes.data.item.status === 'RENTED', '14. PUT /api/items/:id/status updates status to RENTED');
+
+    // 15. Renew listing (+14 days)
+    const renewRes = await makeRequest({
+      hostname: 'localhost',
+      port: 5001,
+      path: `/api/items/${createdRentalId}/renew`,
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${newUserToken}` },
+    });
+    assert(renewRes.status === 200 && renewRes.data.item.status === 'AVAILABLE', '15. PUT /api/items/:id/renew re-lists for 14 days');
+
+    // 16. Campus Broadcast Request (Buyer adds what they want - 3 Day TTL)
+    const broadcastCreate = await makeRequest(
+      {
+        hostname: 'localhost',
+        port: 5001,
+        path: '/api/broadcasts',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${newUserToken}`,
+        },
+      },
+      {
+        title: 'Need a Lab Coat (Size M) for Chemistry Lab',
+        category: 'Clothing',
+        maxBudget: 150,
+        neededByDate: 'Tomorrow 2 PM',
+        notes: 'White lab coat needed urgently in Block C.',
       }
     );
     assert(
-      updateRes.status === 200 && updateRes.data.product.price === 850,
-      '14. PUT /api/products/:id updates price and details'
+      broadcastCreate.status === 201 && broadcastCreate.data.broadcast.status === 'OPEN',
+      '16. POST /api/broadcasts creates campus broadcast request (3-Day TTL)'
     );
 
-    // 15. Delete Product Listing (Owner authorized)
-    const deleteRes = await makeRequest({
+    const broadcastId = broadcastCreate.data.broadcast._id;
+
+    // 17. Broadcast Match ("I Have This" - another student fulfills)
+    const matchRes = await makeRequest({
       hostname: 'localhost',
       port: 5001,
-      path: `/api/products/${createdProductId}`,
-      method: 'DELETE',
+      path: `/api/broadcasts/${broadcastId}/match`,
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }, // Fulfilled by student Aarav Sharma
+    });
+    assert(
+      matchRes.status === 200 && matchRes.data.broadcast.status === 'MATCHED',
+      '17. POST /api/broadcasts/:id/match matches broadcast and creates notification for buyer'
+    );
+
+    // 18. Buyer checks notifications
+    const notifRes = await makeRequest({
+      hostname: 'localhost',
+      port: 5001,
+      path: '/api/notifications',
+      method: 'GET',
       headers: { Authorization: `Bearer ${newUserToken}` },
     });
     assert(
-      deleteRes.status === 200 && deleteRes.data.success,
-      '15. DELETE /api/products/:id deletes student listing'
+      notifRes.status === 200 && notifRes.data.notifications.length > 0,
+      '18. GET /api/notifications retrieves match alert with fulfilling student hostel & phone'
     );
 
     console.log('====================================================');

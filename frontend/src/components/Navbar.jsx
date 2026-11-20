@@ -1,218 +1,223 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../hooks/useNotifications';
 import {
   ShoppingBag,
-  PlusCircle,
+  Plus,
   Bell,
-  User as UserIcon,
   LogOut,
   Package,
-  ShieldCheck,
   ChevronDown,
   Menu,
   X,
-  Sparkles,
+  Radio,
+  User as UserIcon,
+  ShieldCheck,
 } from 'lucide-react';
 
-const Navbar = ({ onOpenSellModal, onSearch, activeCategory, onSelectCategory }) => {
+function timeAgo(dateStr) {
+  const now = Date.now();
+  const diff = now - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+const Navbar = ({ onOpenSellModal, onOpenBroadcastModal }) => {
   const { user, isAuthenticated, logout } = useAuth();
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const { notifications, unreadCount, markAllRead } = useNotifications();
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const profileRef = useRef(null);
   const notifRef = useRef(null);
   const navigate = useNavigate();
 
-  // Close dropdowns when clicking outside
+  // Close dropdowns on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setProfileDropdownOpen(false);
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
       }
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
-        setNotificationsOpen(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const handleLogout = async () => {
+    setProfileOpen(false);
+    setMobileOpen(false);
     await logout();
     navigate('/login');
   };
 
-  const notifications = [
-    {
-      id: 1,
-      title: 'Welcome to CampusKart!',
-      desc: 'Connect with verified students to buy & sell securely on campus.',
-      time: 'Just now',
-      unread: true,
-    },
-    {
-      id: 2,
-      title: 'Safety Tip',
-      desc: 'Always meet in public campus zones like the Central Library or Student Center.',
-      time: '1h ago',
-      unread: false,
-    },
-  ];
-
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-40 bg-[#FFFDF8]/95 backdrop-blur-md border-b border-[#1c1c1d]/20 transition-all">
+      <div className="max-w-[1472px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between h-20">
           {/* Brand Logo & Name */}
-          <div className="flex items-center gap-3">
-            <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#111827] to-[#4F46E5] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-200">
-                <ShoppingBag className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold tracking-tight text-[#111827] flex items-center gap-1">
-                  Campus<span className="text-[#4F46E5]">Kart</span>
-                </span>
-                <span className="hidden sm:inline-block text-[10px] font-medium text-[#6B7280] tracking-wide -mt-1">
-                  Your Campus. Your Marketplace.
-                </span>
-              </div>
-            </Link>
-          </div>
+          <Link
+            to={isAuthenticated ? '/dashboard' : '/'}
+            className="flex items-center gap-3 group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#1c1c1d] flex items-center justify-center text-white shadow-sharp group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform duration-200">
+              <ShoppingBag className="w-5 h-5 text-[#FFFDF8]" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black tracking-tight text-[#1c1c1d] leading-none">
+                Dorm<span className="text-[#464649]">Deal</span>
+              </span>
+              <span className="text-[10px] font-semibold text-[#464649] tracking-wider uppercase mt-0.5">
+                Rishihood University
+              </span>
+            </div>
+          </Link>
 
           {/* Desktop Right Actions */}
-          <div className="hidden md:flex items-center gap-3.5">
+          <div className="hidden md:flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                {/* Sell an Item Button */}
+                {/* Post Broadcast button */}
+                <button
+                  type="button"
+                  onClick={onOpenBroadcastModal}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1c1c1d] bg-white text-[#1c1c1d] text-xs font-bold hover:bg-[#FDF3E0] shadow-sm transition-all"
+                >
+                  <Radio className="w-3.5 h-3.5 text-[#464649]" />
+                  <span>Post Broadcast</span>
+                </button>
+
+                {/* + List Item button */}
                 <button
                   type="button"
                   onClick={onOpenSellModal}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-200 active:scale-95"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1c1c1d] hover:bg-black text-[#FFFDF8] text-xs font-bold shadow-sharp hover:shadow-sharp-lg transition-all active:translate-x-0.5 active:translate-y-0.5 border border-[#1c1c1d]"
                 >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>Sell an Item</span>
+                  <Plus className="w-4 h-4" />
+                  <span>List an Item</span>
                 </button>
 
                 {/* Notifications Bell */}
                 <div className="relative" ref={notifRef}>
                   <button
                     type="button"
-                    onClick={() => setNotificationsOpen(!notificationsOpen)}
-                    className="p-2 text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 rounded-xl transition-colors relative"
-                    aria-label="Notifications"
+                    onClick={() => setNotifOpen(!notifOpen)}
+                    className="p-2.5 text-[#1c1c1d] hover:bg-[#FDF3E0] rounded-xl border border-[#1c1c1d]/20 transition-colors relative"
+                    aria-label="Campus Notifications"
                   >
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#4F46E5] rounded-full ring-2 ring-white"></span>
+                    <Bell className="w-4 h-4 text-[#1c1c1d]" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#1c1c1d] text-[#FFFDF8] text-[10px] font-black rounded-full flex items-center justify-center ring-2 ring-[#FFFDF8]">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
                   </button>
 
-                  {/* Notifications Dropdown */}
-                  {notificationsOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                      <div className="px-4 py-2 border-b border-[#E5E7EB] flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-[#111827]">
+                  {/* Dropdown */}
+                  {notifOpen && (
+                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-2xl border border-[#1c1c1d] py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="px-5 py-2 border-b border-[#1c1c1d]/10 flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#1c1c1d]">
                           Campus Alerts
                         </span>
-                        <span className="text-[11px] text-[#4F46E5] font-medium cursor-pointer">
-                          Mark read
-                        </span>
-                      </div>
-                      <div className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
-                        {notifications.map((item) => (
-                          <div
-                            key={item.id}
-                            className={`p-3.5 hover:bg-gray-50 transition-colors ${
-                              item.unread ? 'bg-indigo-50/40' : ''
-                            }`}
+                        {unreadCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={markAllRead}
+                            className="text-[11px] text-[#1c1c1d] font-bold underline hover:text-[#464649]"
                           >
-                            <p className="text-xs font-semibold text-[#111827]">{item.title}</p>
-                            <p className="text-[12px] text-[#6B7280] mt-0.5 leading-snug">{item.desc}</p>
-                            <span className="text-[10px] text-gray-400 mt-1 block">{item.time}</span>
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="max-h-72 overflow-y-auto divide-y divide-[#1c1c1d]/5">
+                        {notifications.length === 0 ? (
+                          <div className="p-6 text-center text-xs text-[#464649]">
+                            All caught up! 🎉
                           </div>
-                        ))}
+                        ) : (
+                          notifications.map((n) => (
+                            <div
+                              key={n._id}
+                              className={`px-5 py-3 text-xs transition-colors ${
+                                !n.isRead ? 'bg-[#FFF9EE]/70' : 'hover:bg-stone-50'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="font-bold text-[#1c1c1d]">{n.title}</p>
+                                <span className="text-[10px] text-[#464649] shrink-0">
+                                  {timeAgo(n.createdAt)}
+                                </span>
+                              </div>
+                              <p className="text-[#464649] mt-0.5 leading-snug">{n.message}</p>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* User Profile Dropdown */}
-                <div className="relative" ref={dropdownRef}>
+                {/* Profile Dropdown */}
+                <div className="relative" ref={profileRef}>
                   <button
                     type="button"
-                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-100 border border-transparent hover:border-[#E5E7EB] transition-all"
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-[#1c1c1d]/30 hover:bg-[#FDF3E0] transition-colors"
                   >
-                    {user?.profilePhoto ? (
-                      <img
-                        src={user.profilePhoto.startsWith('/uploads') ? `http://localhost:5001${user.profilePhoto}` : user.profilePhoto}
-                        alt={user?.fullName}
-                        className="w-8 h-8 rounded-lg object-cover ring-1 ring-gray-200"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-[#111827] text-white flex items-center justify-center text-xs font-bold">
-                        {user?.fullName?.charAt(0) || 'U'}
-                      </div>
-                    )}
-                    <div className="flex flex-col text-left">
-                      <span className="text-xs font-bold text-[#111827] leading-tight flex items-center gap-1">
-                        {user?.fullName?.split(' ')[0] || 'Student'}
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#16A34A]" />
-                      </span>
-                      <span className="text-[10px] text-[#6B7280] font-mono leading-tight">
-                        {user?.enrollmentId || 'VERIFIED'}
-                      </span>
+                    <div className="w-8 h-8 rounded-lg bg-[#1c1c1d] text-white flex items-center justify-center font-bold text-xs">
+                      {user?.fullName?.charAt(0) || 'S'}
                     </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-[#6B7280]" />
+                    <span className="text-xs font-bold text-[#1c1c1d] max-w-[90px] truncate">
+                      {user?.fullName?.split(' ')[0] || 'Student'}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-[#464649]" />
                   </button>
 
-                  {/* Profile Dropdown Menu */}
-                  {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                      <div className="px-4 py-3 border-b border-[#E5E7EB]">
-                        <p className="text-xs font-bold text-[#111827]">{user?.fullName}</p>
-                        <p className="text-[11px] text-[#6B7280] truncate">{user?.email}</p>
-                        <div className="mt-1.5 flex items-center gap-1.5">
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-50 text-[#16A34A] border border-green-200">
-                            Verified Student
-                          </span>
-                          <span className="text-[10px] font-mono text-gray-500">
-                            {user?.enrollmentId}
-                          </span>
-                        </div>
+                  {profileOpen && (
+                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-3xl shadow-2xl border border-[#1c1c1d] py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="px-4 py-2 border-b border-[#1c1c1d]/10">
+                        <p className="text-xs font-bold text-[#1c1c1d] truncate">
+                          {user?.fullName}
+                        </p>
+                        <p className="text-[11px] text-[#464649] truncate">
+                          {user?.email}
+                        </p>
+                        <p className="text-[10px] font-semibold text-[#1c1c1d] mt-0.5">
+                          {user?.hostelName ? `Hostel: ${user.hostelName} • ${user.roomNumber}` : 'Student'}
+                        </p>
                       </div>
 
                       <div className="py-1">
                         <Link
-                          to="/dashboard"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#111827] hover:bg-gray-50"
-                        >
-                          <Package className="w-4 h-4 text-[#4F46E5]" />
-                          Explore Marketplace
-                        </Link>
-                        <Link
                           to="/disclaimer"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#111827] hover:bg-gray-50"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1c1c1d] hover:bg-[#FFF9EE]"
                         >
-                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                          Campus Safety & Guidelines
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#464649]" />
+                          <span>Campus Safety Guidelines</span>
                         </Link>
                       </div>
 
-                      <div className="border-t border-[#E5E7EB] pt-1">
+                      <div className="border-t border-[#1c1c1d]/10 pt-1">
                         <button
                           type="button"
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#DC2626] hover:bg-red-50 text-left transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#DC2626] hover:bg-red-50 text-left"
                         >
-                          <LogOut className="w-4 h-4" />
-                          Sign Out of CampusKart
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Sign Out</span>
                         </button>
                       </div>
                     </div>
@@ -220,16 +225,16 @@ const Navbar = ({ onOpenSellModal, onSearch, activeCategory, onSelectCategory })
                 </div>
               </>
             ) : (
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-[#111827] hover:text-[#4F46E5] rounded-xl hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-[#1c1c1d] hover:text-[#464649]"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-sm font-semibold rounded-xl shadow-sm transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#1c1c1d] text-[#FFFDF8] text-xs font-bold shadow-sharp"
                 >
                   Register
                 </Link>
@@ -237,76 +242,74 @@ const Navbar = ({ onOpenSellModal, onSearch, activeCategory, onSelectCategory })
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            {isAuthenticated && (
-              <button
-                type="button"
-                onClick={onOpenSellModal}
-                className="p-2 bg-[#4F46E5] text-white rounded-xl text-xs font-medium flex items-center gap-1 shadow-sm"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>Sell</span>
-              </button>
-            )}
+          {/* Mobile hamburger */}
+          <div className="md:hidden flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-[#111827] hover:bg-gray-100 rounded-xl"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-2 text-[#1c1c1d] hover:bg-[#FDF3E0] rounded-xl border border-[#1c1c1d]/30"
+              aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-3 border-t border-[#E5E7EB] space-y-2 animate-in slide-in-from-top-1">
+        {/* Mobile slide-out drawer */}
+        {mobileOpen && (
+          <div className="md:hidden py-4 border-t border-[#1c1c1d]/10 space-y-3 bg-[#FFFDF8]">
             {isAuthenticated ? (
-              <div className="space-y-2">
-                <div className="px-3 py-2 bg-gray-50 rounded-xl">
-                  <p className="text-xs font-bold text-[#111827]">{user?.fullName}</p>
-                  <p className="text-[11px] text-[#6B7280]">{user?.email}</p>
-                  <span className="text-[10px] font-mono text-[#4F46E5]">{user?.enrollmentId}</span>
-                </div>
-                <Link
-                  to="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium text-[#111827] hover:bg-gray-50 rounded-lg"
-                >
-                  Marketplace Dashboard
-                </Link>
-                <Link
-                  to="/disclaimer"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium text-[#111827] hover:bg-gray-50 rounded-lg"
-                >
-                  Campus Guidelines & Disclaimer
-                </Link>
+              <>
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  className="w-full text-left px-3 py-2 text-sm font-semibold text-[#DC2626] hover:bg-red-50 rounded-lg flex items-center gap-2"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    onOpenSellModal();
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#1c1c1d] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sharp"
                 >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
+                  <Plus className="w-4 h-4" />
+                  <span>List an Item</span>
                 </button>
-              </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    onOpenBroadcastModal();
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl border border-[#1c1c1d] bg-white text-[#1c1c1d] text-xs font-bold flex items-center justify-center gap-2"
+                >
+                  <Radio className="w-4 h-4" />
+                  <span>Post a Broadcast (ISO)</span>
+                </button>
+
+                <div className="pt-2 border-t border-[#1c1c1d]/10">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full py-2 px-4 text-xs font-bold text-[#DC2626] text-left flex items-center gap-2"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </>
             ) : (
-              <div className="flex flex-col gap-2 pt-2">
+              <div className="flex flex-col gap-2">
                 <Link
                   to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-semibold text-[#111827] border border-[#E5E7EB] rounded-xl"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full text-center py-2 text-xs font-bold text-[#1c1c1d] border border-[#1c1c1d] rounded-xl"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-semibold text-white bg-[#4F46E5] rounded-xl shadow"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full text-center py-2 text-xs font-bold bg-[#1c1c1d] text-white rounded-xl shadow-sharp"
                 >
-                  Student Registration
+                  Register
                 </Link>
               </div>
             )}

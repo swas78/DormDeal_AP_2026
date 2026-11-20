@@ -1,327 +1,405 @@
-# CampusKart | Your Campus. Your Marketplace.
+<div align="center">
 
-> **University-Exclusive Second-Hand Student Marketplace Platform**  
-> Developed for the **Advanced Programming Course** with primary emphasis on Node.js, Express.js backend architecture, MongoDB/Mongoose data modeling, JWT authentication, and modern React (Vite & Tailwind CSS) frontend design.
+# 🛍️ DormDeal | Your Dorm. Your Deals.
+### **University-Exclusive Peer-to-Peer Student Marketplace & Rental Hub**
 
----
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_8-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-3NF_Schema-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Status](https://img.shields.io/badge/Tests-18%2F18_Passing-success?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 
-## 📖 1. Project Overview
+<br />
 
-**CampusKart** is a modern, responsive, university-exclusive peer-to-peer marketplace (similar to OLX) tailored specifically for enrolled university students. It eliminates fraudulent external third-party listings by requiring student verification, university enrollment identifiers, and signed adherence to campus safety guidelines.
+**A campus-contained circular economy platform connecting verified university students across hostel blocks for direct buying, selling, short-term renting, and reverse broadcast requests with 1-click WhatsApp physical handovers.**
 
-Students can trade and exchange essential campus goods across 8 specialized university categories:
-- **Electronics**: Laptops, scientific calculators, iPads, monitors, adapters
-- **Books & Study Material**: Course textbooks, reference books, handwritten notes, exam guides
-- **Cycles**: Commute bicycles, mountain bikes, locks, helmets
-- **Hostel Essentials**: Electric kettles, table fans, bed tables, storage bins
-- **Furniture**: Study chairs, desks, bookshelves
-- **Sports Equipment**: Badminton rackets, footballs, cricket gear
-- **Fashion**: University varsity jackets, placement blazers, lab coats
-- **Other Items**: Musical instruments, drawing boards, audio accessories
-
----
-
-## 🛠️ 2. Technologies Used
-
-### Backend:
-- **Node.js & Express.js**: RESTful API server.
-- **CommonJS Only**: Built 100% strictly using `require()` and `module.exports` (no ES Modules or `"type": "module"`).
-- **MongoDB & Mongoose**: Object modeling with schemas, validation, pre-save hooks, and indexes.
-- **In-Memory MongoDB Fallback**: Integrated `mongodb-memory-server` fallback so reviewers and evaluators can immediately run the backend out-of-the-box without manual MongoDB configuration!
-- **bcryptjs**: Salted password hashing (10 rounds).
-- **jsonwebtoken (JWT)**: Stateless token-based student session authentication.
-- **Multer**: Multi-part form data processing for profile photographs and product image uploads with strict MIME-type and 5MB size validation.
-- **Helmet**: HTTP security headers (cross-origin resource policies).
-- **CORS**: Cross-Origin Resource Sharing configured for React Vite clients.
-- **Dotenv**: Centralized environment variable management.
-
-### Frontend:
-- **React.js 18 & Vite**: Fast development server and optimized production bundling.
-- **Tailwind CSS**: Custom color palette matching the official specification (`#111827`, `#4F46E5`, `#818CF8`, `#F9FAFB`, `#16A34A`, `#DC2626`).
-- **React Router DOM (v6)**: Declarative client-side routing with `ProtectedRoute` guards and authentication flow redirects.
-- **Axios**: HTTP client with request interceptors (JWT Bearer injection) and response error handling.
-- **Lucide React**: Modern, consistent iconography.
+[Explore Live Demo](#-quick-start) • [System Architecture](#-system-architecture) • [Team Contributions](#-team-work-division) • [DBMS Documentation](#-database--dbms-architecture) • [API Reference](#-api-endpoints-reference)
 
 ---
 
-## 🎨 3. Design System & Colour Palette
+</div>
 
-| Purpose | Name | Hex Code | Usage |
+## 📌 Table of Contents
+1. [Platform Highlights](#-platform-highlights)
+2. [Dual Marketplace Engine (BUY & RENT)](#-dual-marketplace-engine)
+3. [Reverse Marketplace (ISO Broadcast Board)](#-reverse-marketplace-iso-board)
+4. [Handover Contract State Machine](#-handover-contract-lifecycle)
+5. [Campus Taxonomy (11 Categories)](#-11-core-campus-categories)
+6. [Team Responsibility Division](#-team-work-division)
+7. [Database & DBMS Architecture](#-database--dbms-architecture)
+8. [Technology Stack](#-technology-stack)
+9. [API Endpoints Reference](#-api-endpoints-reference)
+10. [Quick Start & Setup](#-quick-start)
+11. [Real OTP Configuration (Email & SMS)](#-real-otp-configuration)
+12. [Verification & Test Suite](#-automated-test-suite)
+
+---
+
+## 🌟 Platform Highlights
+
+DormDeal is engineered to eliminate fraudulent third-party listings, eliminate shipping delays, and remove platform commission fees:
+
+- 🏫 **100% University Verified**: Requires active university enrollment IDs, student emails, hostel block, and room numbers.
+- 🤝 **Direct Offline Handover (No Platform Fees)**: Transactions finalize in-person via cash or UPI upon physical inspection.
+- ⚡ **1-Click WhatsApp Quick-Chat**: Pre-formats `https://wa.me/<phone>?text=<encoded_text>` quoting the exact item, price, and hostel meetup request with zero contact saving friction.
+- 📍 **"In Your Hostel!" Proximity Badges**: Dynamically identifies whether a seller lives on your floor or block.
+- ⏱️ **Auto-Expiry Engines**: 14-day auto-TTL for marketplace listings and 3-day (72-hour) auto-TTL for urgent student broadcast requests.
+- 🔄 **1-Click Relisting / Renew**: One-click listing extension (`+14 days`) so items stay fresh without stale clutter.
+- 🛡️ **Mandatory Defect Disclosure**: Enforces explicit condition explanations (`defectDetails`) if an item has scratches, tears, or defects.
+- 🔒 **Security Deposit Escrow Tracking**: Calculates and protects refundable deposits for short-term tool, camera, and blazer rentals.
+- 🌟 **Verified Deal Reviews**: Strictly 1 review per completed handover, dynamically updating seller trust ratings (1.00 to 5.00).
+
+---
+
+## 🔁 Dual Marketplace Engine
+
+Students can toggle between direct sales and short-term rentals within a unified interface:
+
+```
++-----------------------------------------------------------------------------------------+
+|                                    LISTING MODES                                        |
++-----------------------------------------------------------------------------------------+
+|  DIRECT SALE MODE (BUY)                     |  SHORT-TERM RENTAL HUB (RENT)             |
++---------------------------------------------+-------------------------------------------+
+|  • Permanent ownership transfer             |  • Period-based pricing: hour/day/wk/mo   |
+|  • Fixed Price or Bargaining Toggle         |  • Mandatory Refundable Security Deposit  |
+|  • MRP Discount Savings Display             |  • Escrow return status inspection        |
+|  • 3-Photo visual inspection gallery        |  • Automatic return-to-inventory state    |
+|  • 14-day auto-expiry lifespan              |  • Date-range active rental tracking      |
++-----------------------------------------------------------------------------------------+
+```
+
+---
+
+## 📢 Reverse Marketplace (ISO Board)
+
+Instead of searching endlessly, students who need an item urgently for an exam, project, or event can broadcast an **"In Search Of" (ISO)** request:
+
+1. **Broadcast Creation**: Student posts item needed (*e.g., "Casio 991CW Calculator for tomorrow's exam"*), category, budget (₹), and urgency (*Urgent / Today / Flexible*).
+2. **72-Hour Live Countdown**: Every card displays hours remaining before auto-expiry.
+3. **1-Click "I Have This!" Fulfillment**: Any campus peer with the item clicks one button to fulfill the request.
+4. **Instant In-App Alert**: The requester immediately receives a high-priority notification with the fulfilling student's hostel block, room number, and phone number to coordinate pickup.
+
+---
+
+## 🔄 Handover Contract Lifecycle
+
+DormDeal formalizes transactions through an enforceable state machine rather than unmanaged chats:
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: Buyer requests deal
+    PENDING --> ACCEPTED: Seller approves & sets hostel meetup
+    PENDING --> CANCELLED: Deal rejected
+    ACCEPTED --> ACTIVE: Physical inspection complete; cash/UPI paid
+    ACCEPTED --> CANCELLED: Handover aborted
+    ACTIVE --> RETURNED: (Rental) Item returned & deposit released
+    ACTIVE --> COMPLETED: (Direct Sale) Handover finalized
+    RETURNED --> COMPLETED: Handover finalized
+    COMPLETED --> [*]: Verified 1-to-5 Star Review Unlocked
+```
+
+---
+
+## 📦 11 Core Campus Categories
+
+DormDeal's taxonomy is tailored specifically to university dormitory life:
+
+| Category | Example Student Items |
+| :--- | :--- |
+| **👔 Clothing** | Placement suits & blazers, winter hoodies, ethnic fest formals, college jerseys |
+| **⚡ Electronics** | Scientific calculators (Casio 991EX), extension spikes, kettles, room coolers, DSLR cameras |
+| **📝 Notes** | Handwritten spiral notebooks, semester question banks, exam cheat-sheets |
+| **🖨️ Printouts** | Lab observation manuals, syllabus packets, architecture blueprints |
+| **🍫 Groceries** | Hostel midnight snacks, packaged dry foods, instant noodles, beverages |
+| **📐 Stationery** | Engineering drafters, sheet containers, geometry compass sets, acrylic markers |
+| **🪑 Hostel Decor** | Study desk chairs, foldable bed tables, fairy lights, organizers, laundry hampers |
+| **🍳 Utensils** | Induction cookware, stainless steel plates, mugs, spoons, electric kettles |
+| **🧴 Skincare** | Daily grooming essentials, sunscreens, personal care bottles |
+| **💇 Haircare** | Hair dryers, ceramic straighteners, hair clippers, styling brushes |
+| **🏸 Sports Items** | Badminton racquets, shuttlecocks, gym dumbbells, bicycles, yoga mats |
+
+---
+
+## 👥 Team Work Division
+
+The system workload was split according to technical domains and module complexity. For full details, see **[PROJECT_TEAM_DIVISION.md](file:///Users/swastikmishra1425/Desktop/DormDeal/DormDeal_AP_2026/PROJECT_TEAM_DIVISION.md)**.
+
+```
+                      DORMDEAL RESPONSIBILITY MATRIX
+  =======================================================================
+  
+  [ FRONTEND ARCHITECTURE ]
+  ├─ Marketplace Catalog & Detail Modals ─────── Kunal
+  ├─ Dual Sell/Rent Listing Form ─────────────── Kunal
+  ├─ Category Filter & Search Bar ────────────── Kunal
+  │
+  ├─ Reverse Marketplace ISO Board ───────────── Abhijeet
+  ├─ Deals Handover Contract Manager ─────────── Abhijeet
+  ├─ Post-Handover 1-5 Star Reviews ──────────── Abhijeet
+  └─ Live Notifications Polling Hook ─────────── Abhijeet
+
+  [ BACKEND ARCHITECTURE (~80% Core) ]
+  ├─ Auth, JWT, OTP & Security Middleware ────── Swastik (Lead)
+  ├─ Handover Deals State Machine ────────────── Swastik (Lead)
+  ├─ Auto-Expiry Engine (14d/3d TTL) ─────────── Swastik (Lead)
+  ├─ Reverse Broadcast Matchmaking Engine ────── Swastik (Lead)
+  ├─ Multer Multi-Photo Pipeline ─────────────── Swastik (Lead)
+  │
+  ├─ Items Catalog Read & Search APIs ────────── Kunal (Simple API)
+  ├─ Reviews & Notifications APIs ────────────── Abhijeet (Simple API)
+  └─ Health Ping & DB Connection Handler ─────── Tanishka (Simple API)
+
+  [ DATABASE & DBMS ARCHITECTURE ]
+  ├─ 3NF/BCNF Relational SQL Schema ──────────── Tanishka
+  ├─ ER Diagram & Normalization Proofs ───────── Tanishka
+  ├─ Workload & Analytical SQL Queries ───────── Tanishka
+  ├─ Mongoose Schemas & DB Seeder ────────────── Tanishka
+  └─ DBMS Architecture Documentation ────────── Tanishka
+  =======================================================================
+```
+
+---
+
+## 🗄️ Database & DBMS Architecture
+
+DormDeal implements a dual data architecture: **PostgreSQL Relational 3NF Schema** for formal DBMS documentation and **MongoDB/Mongoose Document Collections** for flexible application persistence.
+
+### Entity Relationship Diagram
+```
++-----------------------------------------------------------------------------------------------------------------+
+|                                           ENTITY RELATIONSHIP OVERVIEW                                          |
++-----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                 |
+|   +-----------------------+              +-----------------------+              +---------------------------+   |
+|   |         USERS         |              |      CATEGORIES       |              |    BROADCAST_REQUESTS     |   |
+|   +-----------------------+              +-----------------------+              +---------------------------+   |
+|   | PK  user_id           |              | PK  category_id       |              | PK  broadcast_id          |   |
+|   |     enrollment_id (UQ)|              |     category_name (UQ)| <------+     | FK  buyer_id      (USERS) |   |
+|   |     email         (UQ)|              |     slug          (UQ)|        |     | FK  category_id (CATEGOR) |   |
+|   |     hostel_name       |              +-----------+-----------+        |     |     title, budget, notes  |   |
+|   |     room_number       |                          |                    |     |     status, expires_at    |   |
+|   |     avg_rating        |                          | 1:N                |     +---------------------------+   |
+|   +-----------+-----------+                          |                    |                                     |
+|               |                                      |                    |                                     |
+|               +-----------------------+              |                    |                                     |
+|               | 1:N (as seller)       | 1:N          v                    |                                     |
+|               v                       v     +--------+------------+       |                                     |
+|   +-----------+-----------+   +-------+---+ |        ITEMS        |       |                                     |
+|   |     NOTIFICATIONS     |   |  REVIEWS  | +---------------------+       |                                     |
+|   +-----------------------+   +-----------+ | PK  item_id         |       |                                     |
+|   | PK  notification_id   |   | review_id | | FK  seller_id       |-------+                                     |
+|   | FK  recipient_id      |   | FK deal_id| | FK  category_id     |                                             |
+|   |     title, message    |   | rating    | |     listing_type    | ('SELL' | 'RENT')                           |
+|   +-----------------------+   +-----+-----+ |     price, deposit  |                                             |
+|                                     |       |     has_defects     |                                             |
+|                                     | 1:1   |     expires_at (14d)|                                             |
+|                                     v       +----------+----------+                                             |
+|                               +-----+-------+          |                                                        |
+|                               |    DEALS    |          | 1:N                                                    |
+|                               +-------------+          v                                                        |
+|                               | PK deal_id  |   +------+------+                                                 |
+|                               | FK item_id  |   | ITEM_IMAGES |                                                 |
+|                               | FK buyer_id |   +-------------+                                                 |
+|                               | FK seller_id|   | PK image_id |                                                 |
+|                               +-------------+   +-------------+                                                 |
++-----------------------------------------------------------------------------------------------------------------+
+```
+
+### DBMS Artifacts in `/dbms`:
+- **`dbms/01_normalization.md`**: Academic proofs eliminating insertion, update, and deletion anomalies through 1NF, 2NF, 3NF, and BCNF.
+- **`dbms/02_er_diagram.svg`**: High-resolution vector Entity-Relationship diagram.
+- **`dbms/03_schema.sql`**: Production PostgreSQL DDL with check constraints and foreign keys.
+- **`dbms/04_queries.sql`**: Workload queries covering seller ratings, active rental deposit audits, and auto-expiry cron cleanups.
+- **`dbms/DATABASE_DOCUMENTATION.md`**: Complete report on transaction isolation, indexing, and normalization.
+
+---
+
+## 💻 Technology Stack
+
+### Backend
+- **Runtime**: Node.js (v18+) with Express.js REST API.
+- **Data Modeling**: Mongoose 8.x + MongoDB.
+- **In-Memory Fallback**: `mongodb-memory-server` (spins up automatically if local MongoDB is offline).
+- **Authentication**: Stateless JWT (`jsonwebtoken`) + Salted bcrypt hashing (`bcryptjs`).
+- **File Storage**: Multer multi-part handler with 5MB validation.
+- **Security**: Helmet security headers, CORS origin isolation, input sanitization.
+- **Notifications & Mail**: Nodemailer SMTP (Gmail, Outlook, custom) + Fast2SMS / Twilio.
+
+### Frontend
+- **Framework**: React 18 with Vite 6.
+- **Styling**: Tailwind CSS with custom Neo-Brutalist design tokens (`#1c1c1d`, `#FFFDF8`, `#FFF9EE`).
+- **Icons**: Lucide React.
+- **Routing**: React Router DOM (v6) with declarative `ProtectedRoute` guards.
+- **HTTP Client**: Axios with automatic JWT Bearer token injection.
+
+---
+
+## 📡 API Endpoints Reference
+
+### 🔐 Authentication & Student Identity
+| Method | Route | Access | Description |
 | :--- | :--- | :--- | :--- |
-| **Primary Navy** | Dark / Header | `#111827` | Headings, hero gradients, text primary |
-| **Primary Indigo** | Brand Accent | `#4F46E5` | Primary buttons, active tabs, brand accents |
-| **Secondary Indigo** | Soft Indigo | `#818CF8` | Secondary badges, borders, gradient transitions |
-| **Background** | Light Grey | `#F9FAFB` | Main app background |
-| **Cards & Modals** | Pure White | `#FFFFFF` | Rounded cards, dropdowns, modal windows |
-| **Border** | Subtle Grey | `#E5E7EB` | Dividers, card borders, input borders |
-| **Text Primary** | Deep Navy | `#111827` | Primary body text and titles |
-| **Text Secondary** | Muted Grey | `#6B7280` | Subtitles, timestamps, metadata |
-| **Success** | Green | `#16A34A` | Verification badges, success states |
-| **Error / Alert** | Red | `#DC2626` | Form errors, delete actions, warnings |
+| `POST` | `/api/auth/send-otp` | Public | Dispatches 6-digit verification OTP (Email / SMS) |
+| `POST` | `/api/auth/verify-otp` | Public | Validates 6-digit OTP code |
+| `POST` | `/api/auth/register` | Public | Registers student with hostel block & room |
+| `POST` | `/api/auth/login` | Public | Authenticates via email/phone and issues JWT |
+| `POST` | `/api/auth/reset-password` | Public | Resets password using verified OTP |
+| `PUT` | `/api/users/accept-disclaimer` | Private | Accepts campus trading guidelines |
+| `GET` | `/api/users/me` | Private | Retrieves current authenticated student profile |
+
+### 🛍️ Marketplace Catalog (BUY & RENT)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/items` | Public | Lists active items with category, search, and type filters |
+| `GET` | `/api/items/:id` | Public | Fetches item details with seller hostel info |
+| `POST` | `/api/items` | Private | Creates new listing with multi-image upload |
+| `PUT` | `/api/items/:id/status` | Private | Updates status (`AVAILABLE`, `RENTED`, `SOLD`) |
+| `PUT` | `/api/items/:id/renew` | Private | Extends listing lifespan by +14 days |
+| `DELETE` | `/api/items/:id` | Private | Deletes listing (owner only) |
+
+### 📢 Reverse Marketplace (ISO Broadcasts)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/broadcasts` | Public | Lists active broadcasts (3-day countdown) |
+| `POST` | `/api/broadcasts` | Private | Creates an urgent item request |
+| `POST` | `/api/broadcasts/:id/match` | Private | "I Have This!" fulfill action; alerts buyer |
+
+### 🤝 Deals & Contract Handover
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/deals` | Private | Initiates purchase or rental deal contract |
+| `GET` | `/api/deals/my-deals` | Private | Fetches active and completed student deals |
+| `PUT` | `/api/deals/:id/status` | Private | Advances state machine (`ACCEPTED`, `ACTIVE`, `RETURNED`, `COMPLETED`, `CANCELLED`) |
+
+### ⭐ Reviews & Notifications
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/reviews` | Private | Submits 1-5 star review for completed deal |
+| `GET` | `/api/reviews/seller/:sellerId` | Public | Retrieves verified reviews for a student |
+| `GET` | `/api/notifications` | Private | Retrieves in-app alerts (30s polling) |
+| `PUT` | `/api/notifications/:id/read` | Private | Marks alert as read |
 
 ---
 
-## 📁 4. Project Directory Structure
+## 🚀 Quick Start
 
-```text
-campusCart/
-├── package.json                   # Root orchestrator (scripts: dev, start, seed, test)
-├── .gitignore                     # Root gitignore
-├── README.md                      # Complete system documentation
-│
-├── backend/                       # 100% CommonJS Node.js & Express Architecture
-│   ├── .env                       # Environment variables (port, db, jwt)
-│   ├── .env.example               # Example template for environment config
-│   ├── .gitignore                 # Backend gitignore
-│   ├── package.json               # Backend dependencies & scripts
-│   ├── server.js                  # Main server entry point & middleware stack
-│   ├── test-api.js                # Automated end-to-end API test runner (15/15 tests)
-│   │
-│   ├── config/
-│   │   └── db.js                  # MongoDB & MongoMemoryServer auto-detection
-│   │
-│   ├── controllers/
-│   │   ├── authController.js      # Register, Send/Verify OTP, Login, Logout, Reset Pwd
-│   │   ├── userController.js      # Get profile, Update profile, Accept disclaimer
-│   │   └── productController.js   # CRUD listings, Search, Filter, Sort, My Listings
-│   │
-│   ├── middleware/
-│   │   ├── authMiddleware.js      # JWT protect & requireDisclaimer guards
-│   │   ├── uploadMiddleware.js    # Multer photo upload configuration & file filters
-│   │   └── errorMiddleware.js     # 404 and global JSON error formatting
-│   │
-│   ├── models/
-│   │   ├── User.js                # Student schema, password hashing & verification
-│   │   ├── Product.js             # Marketplace product schema with categories/conditions
-│   │   └── OTP.js                 # 5-minute TTL one-time verification tokens
-│   │
-│   ├── routes/
-│   │   ├── authRoutes.js          # /api/auth routes
-│   │   ├── userRoutes.js          # /api/users routes
-│   │   └── productRoutes.js       # /api/products routes
-│   │
-│   ├── uploads/                   # Uploaded student images (with .gitkeep)
-│   │   └── .gitkeep
-│   │
-│   └── utils/
-│       ├── generateToken.js       # JWT generation utility
-│       ├── generateOTP.js         # 6-digit OTP generator & delivery simulator
-│       └── seeder.js              # Campus students & 15 realistic seed items
-│
-└── frontend/                      # React.js + Vite + Tailwind CSS Single-Page App
-    ├── index.html                 # HTML shell with Inter typography & favicon
-    ├── package.json               # Frontend dependencies & scripts
-    ├── vite.config.js             # Vite configuration with API & Uploads proxy
-    ├── tailwind.config.js         # Exact colour palette & custom shadows
-    ├── postcss.config.js          # PostCSS & Tailwind integration
-    ├── .gitignore                 # Frontend gitignore
-    │
-    └── src/
-        ├── App.jsx                # React Router setup & ProtectedRoute guards
-        ├── main.jsx               # React DOM root
-        ├── index.css              # Tailwind base & smooth transitions
-        │
-        ├── context/
-        │   └── AuthContext.jsx    # User session, JWT persistence, login/register/logout
-        │
-        ├── services/
-        │   └── api.js             # Axios client with auto Bearer token injection
-        │
-        ├── components/
-        │   ├── Navbar.jsx         # Responsive navigation, sell button, profile dropdown
-        │   ├── Footer.jsx         # Branding, campus guidelines & course info
-        │   ├── ProductCard.jsx    # Card with ₹ price, condition badge, seller & actions
-        │   ├── CategoryCard.jsx   # Interactive cards for 8 campus categories
-        │   ├── SearchBar.jsx      # Keyword search + Category/Condition/Price filters
-        │   ├── ProtectedRoute.jsx # Route guard enforcing authentication & disclaimer
-        │   ├── LoadingSpinner.jsx # Clean animated spinner component
-        │   ├── DisclaimerCard.jsx # 8-point official university guidelines & acceptance
-        │   ├── ProductDetailModal.jsx # Full item preview with direct seller call/email
-        │   ├── SellModal.jsx      # "Sell an Item" form with photo upload & preview
-        │   └── ForgotPasswordModal.jsx # Password recovery modal using OTP
-        │
-        └── pages/
-            ├── SplashScreen.jsx   # Page 1: Opening splash screen with loading & routing
-            ├── RegisterPage.jsx   # Page 2: Student registration with OTP & photo upload
-            ├── DisclaimerPage.jsx # Page 3: Mandatory campus trading guidelines acceptance
-            ├── LoginPage.jsx      # Page 4: Student sign-in with quick autofill demo helper
-            └── DashboardPage.jsx  # Page 5: Main OLX-style student marketplace dashboard
-```
-
----
-
-## ⚡ 5. Installation & Execution Guide
-
-### Prerequisites:
-- **Node.js**: v18.0.0 or higher (v24.x tested)
-- **npm**: v9.0.0 or higher
-
-### Step 1: Install Dependencies
-From the project root directory (`campusCart`):
+### 1. Clone & Install Dependencies
 ```bash
-npm run install:all
+git clone https://github.com/swastikmishra1425/DormDeal.git
+cd DormDeal/DormDeal_AP_2026
+
+# Install backend dependencies
+cd backend && npm install
+
+# Install frontend dependencies
+cd ../frontend && npm install
 ```
-*(This installs root, backend, and frontend dependencies in one step).*
 
----
-
-### Step 2: Configure Environment Variables
-A configured `.env` file is already created in `backend/.env`. You can verify or tweak values:
-
+### 2. Configure Environment Variables
+Inside `DormDeal_AP_2026/backend/.env`:
 ```env
 PORT=5001
 NODE_ENV=development
-MONGO_URI=mongodb://127.0.0.1:27017/campuskart
-JWT_SECRET=campuskart_super_secret_jwt_key_2026_university_market
+MONGO_URI=mongodb://127.0.0.1:27017/dormdeal
+JWT_SECRET=dormdeal_campus_jwt_secret_key_2026
 JWT_EXPIRE=30d
 CLIENT_URL=http://localhost:5173
 ```
-> **Note on Database**: If you have a local MongoDB running on `mongodb://127.0.0.1:27017/campuskart`, it will connect to it. If not, the application automatically boots up an in-memory MongoDB instance via `mongodb-memory-server` with zero configuration needed!
+> 💡 *Note: If local MongoDB is not running, DormDeal automatically launches an embedded In-Memory MongoDB instance and auto-seeds test accounts out-of-the-box!*
 
----
-
-### Step 3: Run the Application
-You can run both backend and frontend together with a single command from the project root:
-
+### 3. Start Development Servers
+From the root directory:
 ```bash
 npm run dev
 ```
-
-Alternatively, you can run backend and frontend in separate terminal tabs:
-
-**Terminal 1 (Backend):**
+Or run each service independently:
 ```bash
-cd backend
-npm run dev
-# Server runs at: http://localhost:5001
-# Health check: http://localhost:5001/api/health
+# Terminal 1: Backend API (:5001)
+cd DormDeal_AP_2026/backend && npm start
+
+# Terminal 2: Frontend Client (:5173)
+cd DormDeal_AP_2026/frontend && npm run dev
 ```
 
-**Terminal 2 (Frontend):**
+### 4. Default Seed Student Credentials
+| Identifier | Password | Hostel Block & Room | Role |
+| :--- | :--- | :--- | :--- |
+| `aarav.sharma@university.edu` | `Password@123` | Block B, Room 304 | Senior Student Seller |
+| `priya.patel@university.edu` | `Password@123` | Block A, Room 108 | Student Renter |
+
+---
+
+## 📧 Real OTP Configuration
+
+DormDeal supports sending actual verification OTPs to students' real email addresses and mobile phones:
+
+### Email Delivery (Gmail Free App Password)
+1. Visit [Google App Passwords](https://myaccount.google.com/apppasswords).
+2. Generate an App Password for **DormDeal** (16 characters).
+3. In `backend/.env`, uncomment and fill:
+   ```env
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_16_char_app_password
+   EMAIL_FROM_NAME="DormDeal Campus Marketplace"
+   ```
+
+### SMS Delivery (Indian +91 Numbers)
+1. Sign up at [Fast2SMS](https://www.fast2sms.com) (free test credits included).
+2. In `backend/.env`, set:
+   ```env
+   FAST2SMS_API_KEY=your_fast2sms_api_key_here
+   ```
+*(When credentials are configured, the demo OTP hint turns off automatically and sends directly to your actual inbox or phone).*
+
+---
+
+## 🧪 Automated Test Suite
+
+Run the full end-to-end integration and unit test suite:
 ```bash
-cd frontend
-npm run dev
-# Vite runs at: http://localhost:5173
+cd DormDeal_AP_2026/backend
+npm test
+```
+
+### Output:
+```
+====================================================
+ STARTING DORMDEAL COMPLETE BACKEND API TEST SUITE
+====================================================
+[PASS] 1. GET /api/health returns healthy status
+[PASS] 2. GET /api/items returns marketplace items (count: 11)
+[PASS] 3. GET /api/items?type=RENT filters campus rental items
+[PASS] 4. GET /api/items?search=calculator searches across titles and descriptions
+[PASS] 5. GET /api/items/:id returns item with seller hostel and room details
+[PASS] 6. POST /api/auth/login succeeds for student Aarav Sharma
+[PASS] 7. GET /api/users/me returns authenticated student with hostel & room
+[PASS] 8. POST /api/auth/send-otp generates 6-digit OTP
+[PASS] 9. POST /api/auth/verify-otp verifies 6-digit code
+[PASS] 10. POST /api/auth/register registers student with hostel details
+[PASS] 11. POST /api/items blocks unaccepted disclaimer with 403 Forbidden
+[PASS] 12. PUT /api/users/accept-disclaimer accepts guidelines
+[PASS] 13. POST /api/items creates RENT listing with security deposit and defect disclosure
+[PASS] 14. PUT /api/items/:id/status updates status to RENTED
+[PASS] 15. PUT /api/items/:id/renew re-lists for 14 days
+[PASS] 16. POST /api/broadcasts creates campus broadcast request (3-Day TTL)
+[PASS] 17. POST /api/broadcasts/:id/match matches broadcast and creates notification for buyer
+[PASS] 18. GET /api/notifications retrieves match alert with fulfilling student hostel & phone
+====================================================
+ TEST SUMMARY: 18 PASSED, 0 FAILED
+====================================================
 ```
 
 ---
 
-### Step 4: Seed Initial Data (Optional)
-The backend automatically checks on startup if the database is empty and auto-seeds 4 student accounts and 15 realistic campus products!
-You can also manually re-seed at any time:
-```bash
-npm run seed
-# or: cd backend && npm run seed
-```
+<div align="center">
 
-**Demo Student Credentials (Pre-seeded):**
-- **Email**: `aarav.sharma@university.edu`
-- **Phone**: `+91 98765 43210`
-- **Password**: `Password@123`
-- *(Tip: On the Login screen, click the **"Autofill Credentials"** button for instant one-click login!)*
+**DormDeal &bull; Advanced Programming & DBMS Course Project &bull; Rishihood University**  
+*Built with ❤️ by Swastik (Lead), Kunal, Abhijeet, and Tanishka*
 
----
-
-### Step 5: Run Automated Backend Tests
-We included an automated end-to-end test suite testing all 15 endpoints:
-```bash
-npm run test
-# or: cd backend && npm test
-```
-**Test Result**: 15 / 15 Passed!
-
----
-
-## 📡 6. Complete REST API Documentation
-
-### Base URL: `http://localhost:5001/api`
-
-### A. Authentication Endpoints (`/api/auth`)
-| Method | Endpoint | Access | Description | Payload / Query |
-| :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/send-otp` | Public | Dispatches 6-digit verification OTP | `{ "identifier": "student@university.edu", "purpose": "registration" }` |
-| `POST` | `/api/auth/verify-otp` | Public | Verifies the OTP code | `{ "identifier": "student@university.edu", "otp": "123456" }` |
-| `POST` | `/api/auth/register` | Public | Registers a new student (Multer upload for `profilePhoto`) | `fullName, enrollmentId, email, phone, password, confirmPassword, termsAccepted, otp` |
-| `POST` | `/api/auth/login` | Public | Authenticates student with email OR phone | `{ "loginIdentifier": "student@university.edu", "password": "Password@123" }` |
-| `POST` | `/api/auth/logout` | Public | Invalidates/clears student session | None |
-| `POST` | `/api/auth/reset-password` | Public | Resets password using OTP | `{ "identifier", "otp", "newPassword", "confirmPassword" }` |
-
-### B. User Endpoints (`/api/users`)
-| Method | Endpoint | Access | Description | Payload |
-| :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/api/users/me` | Protected | Returns authenticated student profile | Requires `Bearer <JWT_TOKEN>` |
-| `PUT` | `/api/users/profile` | Protected | Updates profile photo and contact info | `fullName, phone, profilePhoto (multipart)` |
-| `PUT` | `/api/users/accept-disclaimer` | Protected | Records acceptance of campus guidelines | Sets `disclaimerAccepted: true` |
-
-### C. Product Marketplace Endpoints (`/api/products`)
-| Method | Endpoint | Access | Description | Payload / Query Params |
-| :--- | :--- | :--- | :--- | :--- |
-| `GET` | `/api/products` | Public | Lists products with search & filters | `?search=...&category=...&condition=...&minPrice=...&maxPrice=...&sort=...` |
-| `GET` | `/api/products/:id` | Public | Returns single product with populated seller | URL param `:id` |
-| `GET` | `/api/products/user/my-listings` | Protected | Returns current student's listings | Requires `Bearer <JWT_TOKEN>` |
-| `POST` | `/api/products` | Protected + Disclaimer | Creates listing (Multer upload for `images`) | `title, description, price, category, condition, images` |
-| `PUT` | `/api/products/:id` | Protected + Owner | Updates listing details or price | `title, description, price, category, condition, status` |
-| `DELETE` | `/api/products/:id` | Protected + Owner | Permanently removes student listing | URL param `:id` |
-
----
-
-## 🖥️ 7. The 5 Core Pages & User Experience
-
-### 1. Opening / Splash Screen (`/`)
-- CampusKart branding, animated floating marketplace illustrations, and tagline *"Your Campus. Your Marketplace."*
-- Dynamic gradient in Primary Navy (`#111827`) and Primary Indigo (`#4F46E5`).
-- Intelligent auto-routing:
-  - If authenticated & disclaimer accepted $\to$ `/dashboard`
-  - If authenticated & disclaimer not accepted $\to$ `/disclaimer`
-  - If unauthenticated $\to$ `/login` (with manual fast-track buttons)
-
-### 2. Student Registration Page (`/register`)
-- Comprehensive university fields: Full Name, Enrollment ID, University Email, Phone Number, Profile Photo upload (with real-time preview), Set Password, Confirm Password, OTP Verification, and Terms Checkbox.
-- Live password strength meter (Weak, Moderate, Strong).
-- OTP dispatch & verification modal with developer demo mode hint for effortless grading.
-- Multer file validation (max 5MB, JPEG/PNG/WEBP only).
-- Success notification and immediate transition to the Disclaimer page.
-
-### 3. Disclaimer Page (`/disclaimer`)
-- Pristine white card on light background with indigo headers and alert badges.
-- All 8 official campus trading rules:
-  1. Platform acts only as a connection medium.
-  2. Buyers verify item condition and authenticity.
-  3. Meetups restricted to safe public campus zones (Library, Cafeteria, SAC).
-  4. Never share passwords or OTPs.
-  5. Avoid advance payments or fraudulent requests.
-  6. CampusKart is not liable for private student disputes.
-  7. Genuine student enrollment data required.
-  8. Misconduct or fraud results in campus authority escalation and account ban.
-- Enforced route protection: blocks marketplace dashboard access until the student checks the agreement box and clicks **Accept & Continue**.
-
-### 4. Login Page (`/login`)
-- Dual-mode identifier: sign in using registered University Email OR Phone number.
-- Password show/hide toggle.
-- "Forgot Password?" dialog with 6-digit OTP reset.
-- "Remember this browser" option.
-- One-click **"Autofill Credentials"** banner for reviewers.
-
-### 5. Main Dashboard (`/dashboard`)
-- **Header**: Brand logo, notifications bell with campus alerts, and user avatar dropdown with student name, enrollment ID, verified badge, and sign-out option.
-- **Section A (Welcome Hero)**: Personal greeting ("Welcome back, [Student Name]!"), marketplace stats, and quick-action buttons ("Sell an Item", "My Listings").
-- **Section B (Search & Filter Bar)**: Full-text keyword search across titles and descriptions, condition filter (New, Like New, Good, Used), price range min/max filter, and sorting (Newest, Price: Low-to-High, Price: High-to-Low).
-- **Section C (Categories Grid)**: 8 category cards with icons, item counts, and active filter highlights.
-- **Section D (Product Grid)**: High-resolution cards displaying condition pill, category, formatted price (₹), student seller name, listing date, and "View Details" button.
-- **Section E (Interactive Modals)**:
-  - **Product Details Modal**: Multi-photo view, full description, seller profile, and direct **"Call Seller"** (`tel:`) and **"Email Seller"** (`mailto:`) buttons.
-  - **Sell an Item Modal**: Clean modal with live image upload preview, category dropdown, condition picker, and price input.
-  - **Delete Confirmation Modal**: Prevents accidental deletion of listings.
-
----
-
-## 🔒 8. Security & Best Practices
-
-1. **Password Security**: Passwords are never stored in plain text; hashed using `bcryptjs` with salt rounds = 10.
-2. **Access Control**: Strict JWT token verification; routes enforce that users can only edit or delete products that belong to their own student account (`product.seller.toString() === req.user._id.toString()`).
-3. **Data Sanitization**: Mongoose schemas enforce types, trims, and regex matching. Passwords are automatically omitted from JSON responses.
-4. **HTTP Security Headers**: `helmet()` protects against common web vulnerabilities.
-5. **CORS Isolation**: Restricts API calls to approved origins (`http://localhost:5173`).
-6. **File Upload Restrictions**: Multer checks file size (< 5MB) and rejects non-image MIME types.
-7. **Production vs. Demo OTP Separation**: Demo OTPs are only exposed in dev mode when SMS/email credentials are not configured, and never disclosed in production.
-
+</div>

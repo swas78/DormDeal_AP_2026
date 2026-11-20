@@ -1,21 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --tw-color-icon-default: 70, 70, 73;
+  --color-text-default: #1c1c1d;
+  --color-border-default: #1c1c1d;
+  --color-bg-default: #FFFDF8;
+}
+
+* {
+  font-family: 'Poppins', 'Inter Variable', Helvetica, ui-sans-serif, system-ui, sans-serif;
+  box-sizing: border-box;
+}
+
 @layer base {
   body {
-    background-color: #F9FAFB;
-    color: #111827;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FFFDF8;
+    color: #1c1c1d;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #1c1c1d;
+    letter-spacing: -0.02em;
   }
 }
 
-/* Custom smooth transitions & animations */
+/* Typography styles matching the design system */
+.text-display-hero {
+  font-family: 'Poppins', 'FlechaM', serif, sans-serif;
+  font-size: clamp(2.75rem, 6.5vw, 6.5rem);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -2.4px;
+  color: #1c1c1d;
+}
+
+.text-h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.35rem, 2.5vw, 1.875rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -1.2px;
+  color: #1c1c1d;
+}
+
+.text-desktop-h5 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 30px;
+  letter-spacing: -0.96px;
+  color: #1c1c1d;
+}
+
+.text-mobile-h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.8px;
+  color: #1c1c1d;
+}
+
+.bg-icon-default {
+  background-color: #464649;
+}
+
+.text-icon-default {
+  color: #464649;
+}
+
+/* Site Layout Grid Container */
+.site-main.layout {
+  width: 100%;
+  max-width: 1472px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 4vw, 4rem);
+  padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+/* Custom smooth transitions */
 .transition-smooth {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hide scrollbar for category pills on mobile */
+/* Hide scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -24,3 +101,66 @@
   scrollbar-width: none;
 }
 
+/* Neo-Brutalist Dotted Grid Pattern */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(28, 28, 29, 0.12) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+}
+
+/* Animations for crazy dynamic splash */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-16px) rotate(2deg); }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(16px) rotate(-3deg); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.08); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-reverse 5s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 2.5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 22s linear infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

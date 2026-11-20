@@ -1,9 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/ui/ProtectedRoute';
 
-// 5 Core Pages
 import SplashScreen from './pages/SplashScreen';
 import RegisterPage from './pages/RegisterPage';
 import DisclaimerPage from './pages/DisclaimerPage';

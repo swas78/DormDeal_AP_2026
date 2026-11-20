@@ -8,7 +8,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure storage
+// Multer disk storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -20,16 +20,14 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter: Allow only images
+// File filter: Only images allowed
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp|gif/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase()
-  );
-  const mimetype = allowedTypes.test(file.mimetype);
+  const allowed = /jpeg|jpg|png|webp|gif/;
+  const isExtValid = allowed.test(path.extname(file.originalname).toLowerCase());
+  const isMimeValid = allowed.test(file.mimetype);
 
-  if (extname && mimetype) {
-    return cb(null, true);
+  if (isExtValid && isMimeValid) {
+    cb(null, true);
   } else {
     cb(new Error('Only image files (JPEG, JPG, PNG, WEBP, GIF) are allowed.'));
   }
@@ -44,4 +42,3 @@ const upload = multer({
 });
 
 module.exports = upload;
-
