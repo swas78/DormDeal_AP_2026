@@ -94,45 +94,67 @@ const sendRealSMS = async (phoneNumber, otp) => {
 
   // 1. Fast2SMS Option (Standard in India for instant OTP)
   if (process.env.FAST2SMS_API_KEY) {
-    return new Promise((resolve) => {
-      const postData = JSON.stringify({
-        variables_values: otp,
-        route: 'otp',
+    const makeFast2SMSRequest = (payload) => {
+      return new Promise((resolve) => {
+        const postData = JSON.stringify(payload);
+        const options = {
+          hostname: 'www.fast2sms.com',
+          path: '/dev/bulkV2',
+          method: 'POST',
+          headers: {
+            authorization: process.env.FAST2SMS_API_KEY,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData),
+          },
+        };
+
+        const req = https.request(options, (res) => {
+          let body = '';
+          res.on('data', (chunk) => { body += chunk; });
+          res.on('end', () => {
+            try {
+              const parsed = JSON.parse(body);
+              resolve(parsed);
+            } catch {
+              resolve({ return: false });
+            }
+          });
+        });
+
+        req.on('error', (e) => {
+          console.error('[Fast2SMS Error]:', e.message);
+          resolve({ return: false });
+        });
+
+        req.write(postData);
+        req.end();
+      });
+    };
+
+    // Try route: 'otp' first
+    let result = await makeFast2SMSRequest({
+      variables_values: otp,
+      route: 'otp',
+      numbers: cleanPhone,
+    });
+
+    // If website verification required (996), fallback to Quick SMS (route: 'q')
+    if (!result.return && result.status_code === 996) {
+      result = await makeFast2SMSRequest({
+        route: 'q',
+        message: `Your DormDeal verification OTP is: ${otp}. Valid for 5 minutes.`,
+        flash: 0,
         numbers: cleanPhone,
       });
+    }
 
-      const options = {
-        hostname: 'www.fast2sms.com',
-        path: '/dev/bulkV2',
-        method: 'POST',
-        headers: {
-          authorization: process.env.FAST2SMS_API_KEY,
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData),
-        },
-      };
+    if (!result.return) {
+      console.log('[Fast2SMS Notice]:', result.message || result);
+    }
 
-      const req = https.request(options, (res) => {
-        let body = '';
-        res.on('data', (chunk) => { body += chunk; });
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(body);
-            resolve(parsed.return === true);
-          } catch {
-            resolve(false);
-          }
-        });
-      });
-
-      req.on('error', (e) => {
-        console.error('[Fast2SMS Error]:', e.message);
-        resolve(false);
-      });
-
-      req.write(postData);
-      req.end();
-    });
+    if (result.return === true) {
+      return true;
+    }
   }
 
   // 2. Twilio Option (Global SMS)
