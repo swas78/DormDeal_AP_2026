@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import BroadcastCard from './BroadcastCard';
 import BroadcastModal from './BroadcastModal';
+import { Radio, CheckCircle2, User, Layers } from 'lucide-react';
 
 // Ghost card shown while loading
 function SkeletonCard() {
@@ -36,10 +37,11 @@ export default function BroadcastFeed({ onShowToast }) {
   const [broadcasts, setBroadcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [filterTab, setFilterTab] = useState('ALL'); // 'ALL' | 'OPEN' | 'MATCHED' | 'MINE'
 
   const fetchBroadcasts = useCallback(async () => {
     try {
-      const res = await api.get('/broadcasts?status=active');
+      const res = await api.get('/broadcasts?status=ALL');
       if (res.data?.success) {
         setBroadcasts(res.data.broadcasts || []);
       }
@@ -50,21 +52,20 @@ export default function BroadcastFeed({ onShowToast }) {
     }
   }, []);
 
-  // Initial fetch + 60-second polling
+  // Initial fetch + 30-second polling
   useEffect(() => {
     fetchBroadcasts();
-    const id = setInterval(fetchBroadcasts, 60000);
+    const id = setInterval(fetchBroadcasts, 30000);
     return () => clearInterval(id);
   }, [fetchBroadcasts]);
 
   async function handleFulfill(broadcastId) {
     try {
-      await api.post(`/broadcasts/${broadcastId}/fulfill`);
-      onShowToast('✅ Done! The student will get your contact details.');
-      // Refresh feed so the card updates to FULFILLED
+      await api.post(`/broadcasts/${broadcastId}/match`);
+      onShowToast?.('Accepted! The student has been notified with your contact details.');
       fetchBroadcasts();
     } catch (err) {
-      onShowToast('❌ Could not complete. Try again.');
+      onShowToast?.(err.response?.data?.message || 'Could not complete. Try again.');
       console.error('[BroadcastFeed] fulfill error:', err.message);
     }
   }
@@ -73,58 +74,152 @@ export default function BroadcastFeed({ onShowToast }) {
     try {
       await api.delete(`/broadcasts/${broadcastId}`);
       setBroadcasts((prev) => prev.filter((b) => b._id !== broadcastId));
-      onShowToast('🗑 Broadcast deleted.');
+      onShowToast?.('Broadcast request removed.');
     } catch (err) {
-      onShowToast('❌ Could not delete. Try again.');
+      onShowToast?.('Could not delete request. Try again.');
       console.error('[BroadcastFeed] delete error:', err.message);
     }
   }
 
   function handleBroadcastPosted() {
     fetchBroadcasts();
-    onShowToast('📢 Your broadcast is live! Students will see it now.');
+    onShowToast?.('Your request is live on campus! Students will see it now.');
+    setModalOpen(false);
   }
 
-  return (
-    <section className="w-full">
+  // Filter calculations
+  const totalCount = broadcasts.length;
+  const matchedCount = broadcasts.filter((b) => b.status === 'MATCHED' || b.status === 'FULFILLED').length;
+  const openCount = broadcasts.filter((b) => b.status !== 'MATCHED' && b.status !== 'FULFILLED').length;
+  const myCount = broadcasts.filter((b) => {
+    const poster = b.buyer || b.poster;
+    return user && poster && (poster._id === user._id || poster._id === user.id);
+  }).length;
 
-      {/* Section header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+  const filteredBroadcasts = broadcasts.filter((b) => {
+    const poster = b.buyer || b.poster;
+    const isMine = user && poster && (poster._id === user._id || poster._id === user.id);
+    const isMatched = b.status === 'MATCHED' || b.status === 'FULFILLED';
+
+    if (filterTab === 'OPEN') return !isMatched;
+    if (filterTab === 'MATCHED') return isMatched;
+    if (filterTab === 'MINE') return isMine;
+    return true;
+  });
+
+  return (
+    <section className="w-full space-y-6">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#1c1c1d]/15">
         <div>
-          <h2 className="text-xl font-bold text-[#111827] flex items-center gap-2">
-            📢 Campus Broadcast Board
+          <h2 className="text-2xl font-bold text-[#1c1c1d] tracking-tight flex items-center gap-2">
+            <Radio className="w-5 h-5 text-[#1c1c1d]" />
+            <span>Campus Broadcast Board (In Search Of)</span>
           </h2>
-          <p className="text-sm text-gray-400 mt-0.5">What students are looking for</p>
+          <p className="text-xs text-[#464649] mt-0.5">
+            Post what you urgently need for exams or hostel rooms. Any student on campus can fulfill it.
+          </p>
         </div>
+
         <button
+          type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4F46E5] text-white text-sm font-bold hover:bg-indigo-700 active:scale-95 transition-all shrink-0"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1c1c1d] hover:bg-black text-[#FFFDF8] text-xs font-bold shadow-sharp hover:shadow-sharp-lg active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0 border border-[#1c1c1d]"
         >
-          <span className="text-base leading-none">+</span> Post a Request
+          <span className="text-base leading-none">+</span>
+          <span>Post a Request</span>
         </button>
       </div>
 
-      {/* Grid */}
+      {/* Filter Tabs: All, Open, Accepted & Matched, My Requests */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setFilterTab('ALL')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+            filterTab === 'ALL'
+              ? 'bg-[#1c1c1d] text-[#FFFDF8] border-[#1c1c1d] shadow-sm'
+              : 'bg-white text-[#1c1c1d] hover:bg-stone-50 border-[#1c1c1d]/20'
+          }`}
+        >
+          All Requests ({totalCount})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilterTab('OPEN')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+            filterTab === 'OPEN'
+              ? 'bg-[#1c1c1d] text-[#FFFDF8] border-[#1c1c1d] shadow-sm'
+              : 'bg-white text-[#1c1c1d] hover:bg-stone-50 border-[#1c1c1d]/20'
+          }`}
+        >
+          Looking for Items ({openCount})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setFilterTab('MATCHED')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+            filterTab === 'MATCHED'
+              ? 'bg-emerald-700 text-white border-emerald-800 shadow-sm'
+              : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border-emerald-300'
+          }`}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>Accepted &amp; Matched ({matchedCount})</span>
+        </button>
+
+        {user && (
+          <button
+            type="button"
+            onClick={() => setFilterTab('MINE')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+              filterTab === 'MINE'
+                ? 'bg-[#1c1c1d] text-[#FFFDF8] border-[#1c1c1d] shadow-sm'
+                : 'bg-white text-[#1c1c1d] hover:bg-stone-50 border-[#1c1c1d]/20'
+            }`}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>My Requests ({myCount})</span>
+          </button>
+        )}
+      </div>
+
+      {/* Grid Content */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <SkeletonCard />
           <SkeletonCard />
         </div>
-      ) : broadcasts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <span className="text-5xl mb-4">📭</span>
-          <p className="text-gray-500 font-medium">No active broadcast requests.</p>
-          <p className="text-sm text-gray-400 mt-1">Be the first to post what you need!</p>
+      ) : filteredBroadcasts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-white rounded-3xl border border-[#1c1c1d]/20 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-[#FFF9EE] border border-[#1c1c1d] text-[#1c1c1d] flex items-center justify-center mb-4">
+            <Radio className="w-7 h-7" />
+          </div>
+          <h3 className="text-base font-bold text-[#1c1c1d]">
+            {filterTab === 'MATCHED'
+              ? 'No accepted broadcasts yet.'
+              : filterTab === 'MINE'
+              ? 'You have not posted any broadcast requests.'
+              : 'No campus broadcast requests found.'}
+          </h3>
+          <p className="text-xs text-[#464649] mt-1 max-w-sm">
+            {filterTab === 'MATCHED'
+              ? 'When a dorm mate clicks "I Have This!" on a request, it will appear here.'
+              : 'Need a drafter, cycle, or lab coat? Post a request with your budget!'}
+          </p>
           <button
+            type="button"
             onClick={() => setModalOpen(true)}
-            className="mt-5 px-6 py-2.5 rounded-xl bg-[#4F46E5] text-white text-sm font-bold hover:bg-indigo-700 transition-all"
+            className="mt-5 px-5 py-2.5 rounded-xl bg-[#1c1c1d] hover:bg-black text-[#FFFDF8] text-xs font-bold transition-all shadow-sharp"
           >
             Post a Request
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {broadcasts.map((broadcast) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {filteredBroadcasts.map((broadcast) => (
             <BroadcastCard
               key={broadcast._id}
               broadcast={broadcast}

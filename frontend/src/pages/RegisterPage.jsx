@@ -104,13 +104,9 @@ const RegisterPage = () => {
       const res = await api.post('/auth/send-otp', { identifier, purpose: 'registration' });
       if (res.data?.success) {
         setOtpSent(true);
-        if (res.data.demoOtp) {
-          setDemoOtpHint(`Demo OTP: ${res.data.demoOtp}`);
-          setOtp(res.data.demoOtp);
-        } else {
-          setDemoOtpHint('');
-        }
-        setFormSuccess(res.data.message || 'OTP sent to your university email or phone.');
+        setOtp('');
+        setDemoOtpHint('');
+        setFormSuccess('Verification OTP sent to your email inbox! Please check and enter the 6-digit code below.');
       }
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
@@ -445,12 +441,6 @@ const RegisterPage = () => {
                 )}
               </div>
 
-              {demoOtpHint && (
-                <div className="p-2.5 bg-white border border-indigo-200 text-[#4F46E5] rounded-xl text-xs font-semibold flex items-center justify-between">
-                  <span>{demoOtpHint}</span>
-                  <span className="text-[10px] bg-indigo-50 px-2 py-0.5 rounded text-indigo-700">Auto-filled</span>
-                </div>
-              )}
 
               {otpSent && !otpVerified && (
                 <div className="flex items-center gap-2 pt-1">

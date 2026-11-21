@@ -8,15 +8,22 @@ const Notification = require('../models/Notification');
  */
 const getBroadcasts = async (req, res, next) => {
   try {
-    const { category, status = 'OPEN' } = req.query;
+    const { category, status } = req.query;
 
     const query = {};
-    if (status && status !== 'ALL') query.status = status;
+    if (!status || status === 'active' || status === 'OPEN') {
+      query.status = { $in: ['OPEN', 'MATCHED'] };
+    } else if (status === 'MATCHED') {
+      query.status = 'MATCHED';
+    } else if (status !== 'ALL') {
+      query.status = status;
+    }
+
     if (category && category !== 'All') query.category = category;
 
     const broadcasts = await BroadcastRequest.find(query)
       .populate('buyer', 'fullName enrollmentId hostelName roomNumber academicYear profilePhoto phone email')
-      .populate('matchedBy', 'fullName hostelName roomNumber')
+      .populate('matchedBy', 'fullName hostelName roomNumber phone email')
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
