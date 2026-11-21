@@ -16,7 +16,7 @@ const sampleStudents = [
     fullName: 'Aarav Sharma',
     enrollmentId: '2023CSB1012',
     email: 'aarav.sharma@university.edu',
-    phone: '+91 98765 43210',
+    phone: '+91 72753 25716',
     password: 'Password@123',
     hostelName: 'Block B',
     roomNumber: 'Room 304',
@@ -265,7 +265,7 @@ const seedDatabase = async (shouldExit = true) => {
     console.log('====================================================');
     console.log(' SEEDING COMPLETE! Test Student Credentials:');
     console.log(' Email   : aarav.sharma@university.edu');
-    console.log(' Phone   : +91 98765 43210');
+    console.log(' Phone   : +91 72753 25716');
     console.log(' Password: Password@123');
     console.log(' Hostel  : Block B, Room 304');
     console.log('====================================================');

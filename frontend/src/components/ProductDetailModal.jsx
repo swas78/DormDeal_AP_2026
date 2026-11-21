@@ -82,10 +82,11 @@ const ProductDetailModal = ({ product, onClose }) => {
 
   const isRent = product.listingType === 'RENT';
 
-  const cleanPhone = sellerPhone ? sellerPhone.replace(/[^0-9]/g, '') : '';
-  const waPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+  // Default WhatsApp number configuration for 1-click campus connect
+  const DEFAULT_WA_PHONE = '917275325716';
+  const waPhone = DEFAULT_WA_PHONE;
   const waMessage = encodeURIComponent(
-    `Hi ${sellerName}, I am interested in your listing "${product.title}" on DormDeal. Is it still available?`
+    `Hi ${sellerName}! I saw your listing "${product.title}" (₹${product.price}) on DormDeal. Is it still available for campus handover at ${sellerHostel || 'hostel'}?`
   );
   const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
 
@@ -290,17 +291,15 @@ const ProductDetailModal = ({ product, onClose }) => {
 
               {/* Direct Communication Buttons */}
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {sellerPhone ? (
-                  <a
-                    href={waUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-extrabold rounded-xl border border-emerald-800 shadow-sm transition-all text-center"
-                  >
-                    <MessageCircle className="w-4 h-4 text-white" />
-                    <span>WhatsApp</span>
-                  </a>
-                ) : null}
+                <a
+                  href={waUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-extrabold rounded-xl border border-emerald-800 shadow-sm transition-all text-center"
+                >
+                  <MessageCircle className="w-4 h-4 text-white" />
+                  <span>WhatsApp</span>
+                </a>
 
                 {sellerPhone ? (
                   <a

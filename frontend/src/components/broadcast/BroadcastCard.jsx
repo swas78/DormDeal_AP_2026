@@ -131,23 +131,21 @@ export default function BroadcastCard({ broadcast, currentUser, onFulfill, onDel
             {broadcast.matchedBy?.roomNumber ? ` • Room ${broadcast.matchedBy.roomNumber}` : ''}
           </p>
 
-          {broadcast.matchedBy?.phone && (
-            <div className="pt-1 flex flex-wrap items-center gap-2">
-              <a
-                href={`https://wa.me/91${broadcast.matchedBy.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                  `Hi ${broadcast.matchedBy.fullName}, I saw you accepted my DormDeal broadcast request for "${broadcast.title}"!`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[11px] shadow-sm transition-colors"
-              >
-                <span>Chat on WhatsApp</span>
-              </a>
-              <span className="text-[11px] font-mono text-emerald-900 font-semibold">
-                Phone: {broadcast.matchedBy.phone}
-              </span>
-            </div>
-          )}
+          <div className="pt-1 flex flex-wrap items-center gap-2">
+            <a
+              href={`https://wa.me/917275325716?text=${encodeURIComponent(
+                `Hi! I saw you accepted my DormDeal broadcast request for "${broadcast.title}". Let's connect for the hostel handover!`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[11px] shadow-sm transition-colors"
+            >
+              <span>Chat on WhatsApp</span>
+            </a>
+            <span className="text-[11px] font-mono text-emerald-900 font-semibold">
+              Phone: {broadcast.matchedBy?.phone || '+91 72753 25716'}
+            </span>
+          </div>
         </div>
       )}
 

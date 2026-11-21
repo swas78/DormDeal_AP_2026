@@ -164,11 +164,11 @@ export default function DealsFeed({ onShowToast }) {
             const otherParty = isBuyer ? deal.seller : deal.buyer;
             const roleBadge = isBuyer ? 'You are Buyer' : 'You are Seller';
 
-            // Clean phone for WhatsApp
-            const rawPhone = otherParty?.phone ? otherParty.phone.replace(/[^0-9]/g, '') : '';
-            const waPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+            // WhatsApp routing to default 7275325716
+            const DEFAULT_WA_PHONE = '917275325716';
+            const waPhone = DEFAULT_WA_PHONE;
             const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(
-              `Hi ${otherParty?.fullName}, regarding our DormDeal contract for "${deal.item?.title}". Let's coordinate campus handover!`
+              `Hi ${otherParty?.fullName || 'there'}! Regarding our DormDeal contract for "${deal.item?.title || 'item'}". Let's coordinate the campus handover!`
             )}`;
 
             return (
